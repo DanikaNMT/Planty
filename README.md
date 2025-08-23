@@ -1,2 +1,2 @@
 # Planty
-Plant tracking android app
+Plant tracking android app test
