@@ -29,7 +29,7 @@ fun PlantCard(plant: Plant, onClick: () -> Unit) {
             .padding(5.dp)
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(0.dp),
-        colors = CardDefaults.cardColors(Color(0xFFEBC373))
+        colors = CardDefaults.cardColors(Color(0xA0f2dac4))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
