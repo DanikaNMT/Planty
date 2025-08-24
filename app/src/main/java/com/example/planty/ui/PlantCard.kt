@@ -19,6 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import coil.compose.rememberAsyncImagePainter
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.until
 
 
 @Composable
@@ -53,6 +58,25 @@ fun PlantCard(plant: Plant, onClick: () -> Unit) {
 
                 Text(
                     text = "🌱 " + plant.plantSort,
+                    modifier = Modifier.padding(10.dp, 1.dp, 0.dp, 1.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Text(
+                    text = plant.lastWatered?.let { instant ->
+                        val now = Clock.System.now()
+                        val duration = instant.until(now, DateTimeUnit.HOUR)
+                        val daysDiff = (duration / 24).toInt()
+                        when {
+                            daysDiff == 0 -> "📆 Watered today"
+                            daysDiff == 1 -> "📆 Watered yesterday"
+                            daysDiff < 7 -> "📆 Watered $daysDiff days ago"
+                            else -> {
+                                val localDate = instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
+                                "📆 Last watered: ${localDate.month.name.take(3)} ${localDate.dayOfMonth}"
+                            }
+                        }
+                    } ?: "📆 Not watered yet",
                     modifier = Modifier.padding(10.dp, 1.dp, 0.dp, 1.dp),
                     style = MaterialTheme.typography.bodyLarge
                 )
