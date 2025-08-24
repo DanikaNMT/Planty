@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.planty
 
 import org.junit.Test
 
