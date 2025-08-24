@@ -28,7 +28,7 @@ class PlantViewModel : ViewModel() {
         fetchAllPlants()
     }
 
-    private fun fetchAllPlants() {
+    fun fetchAllPlants() {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
@@ -54,5 +54,35 @@ class PlantViewModel : ViewModel() {
 
     fun setSelectedPlant(plant: Plant) {
         _selectedPlant.value = plant
+    }
+
+    // Add plant creation method to this ViewModel too if you want to handle it here
+    fun addPlant(name: String, plantSort: String, photo: String, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+
+            val newPlant = Plant(
+                id = 0, // Server will assign real ID
+                name = name,
+                photo = photo,
+                plantSort = plantSort,
+                lastWatered = null
+            )
+
+            val result = repository.createPlant(newPlant)
+
+            result.fold(
+                onSuccess = { createdPlant ->
+                    // Refresh the plants list to include the new plant
+                    fetchAllPlants()
+                    onSuccess()
+                },
+                onFailure = { exception ->
+                    _error.value = exception.message ?: "Failed to create plant"
+                    _isLoading.value = false
+                }
+            )
+        }
     }
 }

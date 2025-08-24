@@ -1,4 +1,5 @@
 package com.example.planty.ui
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,7 +13,8 @@ import com.example.planty.viewmodel.PlantViewModel
 @Composable
 fun PlantScreen(
     viewModel: PlantViewModel = viewModel(),
-    onPlantClick: (Plant) -> Unit
+    onPlantClick: (Plant) -> Unit,
+    onAddPlantClick: (() -> Unit)? = null
 ) {
     val plants by viewModel.plants
     val isLoading by viewModel.isLoading
@@ -42,7 +44,8 @@ fun PlantScreen(
             else -> {
                 PlantOverview(
                     plants = plants,
-                    onPlantClick = onPlantClick
+                    onPlantClick = onPlantClick,
+                    onAddPlantClick = onAddPlantClick  // Pass the parameter here!
                 )
             }
         }
