@@ -1,0 +1,12 @@
+
+{
+  "name": "plant-json-server",
+  "version": "1.0.0",
+  "description": "JSON server for plant data",
+  "scripts": {
+    "start": "npx json-server --host 0.0.0.0 --port 3000 db.json"
+  },
+  "dependencies": {
+    "json-server": "0.17.4"
+  }
+}
