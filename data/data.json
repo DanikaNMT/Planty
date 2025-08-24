@@ -4,91 +4,106 @@
       "id": 1,
       "name": "Monstera Deliciosa",
       "photo": "https://green-bubble.com/cdn/shop/files/MonsteraDeliciosa-110cm-610319_1920x.jpg?v=1736442436",
-      "plantSort": "Tropical"
+      "plantSort": "Tropical",
+      "lastWatered": "2025-08-22T09:30:00Z"
     },
     {
       "id": 2,
       "name": "Lavender",
       "photo": "https://tse1.mm.bing.net/th/id/OIP.Bpk9gXCNHUFOWjxbzUhSAwHaHd?rs=1&pid=ImgDetMain&o=7&rm=3",
-      "plantSort": "Herb"
+      "plantSort": "Herb",
+      "lastWatered": "2025-08-20T16:15:00Z"
     },
     {
       "id": 3,
       "name": "Aloe Vera",
       "photo": "https://th.bing.com/th/id/R.4517cf278c8b20122b1a3a762b34a6a4?rik=kV4coiSsyMupqA&riu=http%3a%2f%2fcdn.shopify.com%2fs%2ffiles%2f1%2f0047%2f9730%2f0847%2fproducts%2fnurserylive-plants-aloe-vera-succulent-plant-16968585871500.jpg%3fv%3d1634213151&ehk=xCfKD3PqcctG6QbgskGe0KasmCOO1ILtU3iIZnA61cw%3d&risl=&pid=ImgRaw&r=0",
-      "plantSort": "Succulent"
+      "plantSort": "Succulent",
+      "lastWatered": "2025-08-18T11:45:00Z"
     },
     {
       "id": 4,
       "name": "Fiddle Leaf Fig",
       "photo": "https://tse1.mm.bing.net/th/id/OIP.fwlgYyZhOu9WwOlxEta9xAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
-      "plantSort": "Indoor"
+      "plantSort": "Indoor",
+      "lastWatered": "2025-08-21T14:20:00Z"
     },
     {
       "id": 5,
       "name": "Cactus",
       "photo": "https://i.pinimg.com/originals/13/2f/ce/132fce2342354ee6344a974e7cc7ef5b.jpg",
-      "plantSort": "Desert"
+      "plantSort": "Desert",
+      "lastWatered": "2025-08-10T08:00:00Z"
     },
     {
       "id": 6,
       "name": "Snake Plant",
       "photo": "https://tse2.mm.bing.net/th/id/OIP.YqVWOE8Q4X5KjF7EzNZzgwHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Indoor"
+      "plantSort": "Indoor",
+      "lastWatered": "2025-08-19T10:30:00Z"
     },
     {
       "id": 7,
       "name": "Rosemary",
       "photo": "https://tse1.mm.bing.net/th/id/OIP.dF9K9JJ4Y5YjQzxHR7xQgwHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Herb"
+      "plantSort": "Herb",
+      "lastWatered": "2025-08-23T07:45:00Z"
     },
     {
       "id": 8,
       "name": "Bird of Paradise",
       "photo": "https://tse4.mm.bing.net/th/id/OIP.8vBzGXzFNV7Q6K8tGELgTAHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Tropical"
+      "plantSort": "Tropical",
+      "lastWatered": "2025-08-21T18:00:00Z"
     },
     {
       "id": 9,
       "name": "Jade Plant",
       "photo": "https://tse3.mm.bing.net/th/id/OIP.zPFn8ZQdJN4mHQRUjM8uRgHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Succulent"
+      "plantSort": "Succulent",
+      "lastWatered": "2025-08-15T13:15:00Z"
     },
     {
       "id": 10,
       "name": "Prickly Pear",
       "photo": "https://tse3.mm.bing.net/th/id/OIP.fH6ZbYjJe7rQwDvCdgEIDAHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Desert"
+      "plantSort": "Desert",
+      "lastWatered": "2025-08-08T12:00:00Z"
     },
     {
       "id": 11,
       "name": "Rubber Tree",
       "photo": "https://tse1.mm.bing.net/th/id/OIP.5qNMGZAb7G9QYjYH1RGirgHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Indoor"
+      "plantSort": "Indoor",
+      "lastWatered": "2025-08-22T15:30:00Z"
     },
     {
       "id": 12,
       "name": "Basil",
       "photo": "https://tse4.mm.bing.net/th/id/OIP.jUfz8rOKJ0L6xBn1Wx1KKQHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Herb"
+      "plantSort": "Herb",
+      "lastWatered": "2025-08-24T06:30:00Z"
     },
     {
       "id": 13,
       "name": "Philodendron",
       "photo": "https://tse1.mm.bing.net/th/id/OIP.qM5mVH8xY4oQ9rQlKYe-xQHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Tropical"
+      "plantSort": "Tropical",
+      "lastWatered": "2025-08-20T11:00:00Z"
     },
     {
       "id": 14,
       "name": "Echeveria",
       "photo": "https://tse4.mm.bing.net/th/id/OIP.vB6YzWNkiP8pJHh9yK1PfQHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Succulent"
+      "plantSort": "Succulent",
+      "lastWatered": "2025-08-17T09:20:00Z"
     },
     {
       "id": 15,
       "name": "Barrel Cactus",
       "photo": "https://tse2.mm.bing.net/th/id/OIP.hR7Q9AXjF1Y0tGZ2BwLtgwHaHa?rs=1&pid=ImgDetMain",
-      "plantSort": "Desert"
+      "plantSort": "Desert",
+      "lastWatered": "2025-08-05T14:45:00Z"
     }
   ]
 }

@@ -1,15 +1,12 @@
 package com.example.planty.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.planty.model.Plant
 import com.example.planty.repository.PlantRepository
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
-
 
 class PlantViewModel : ViewModel() {
     private val repository = PlantRepository()
@@ -22,6 +19,10 @@ class PlantViewModel : ViewModel() {
 
     private val _error = mutableStateOf<String?>(null)
     val error: State<String?> = _error
+
+    // Add selected plant state
+    private val _selectedPlant = mutableStateOf<Plant?>(null)
+    val selectedPlant: State<Plant?> = _selectedPlant
 
     init {
         fetchAllPlants()
@@ -49,5 +50,9 @@ class PlantViewModel : ViewModel() {
 
     fun refreshPlants() {
         fetchAllPlants()
+    }
+
+    fun setSelectedPlant(plant: Plant) {
+        _selectedPlant.value = plant
     }
 }

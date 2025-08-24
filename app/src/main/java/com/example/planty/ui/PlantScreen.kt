@@ -40,7 +40,7 @@ fun PlantScreen(
             }
 
             else -> {
-                plantOverview(
+                PlantOverview(
                     plants = plants,
                     onPlantClick = onPlantClick
                 )
