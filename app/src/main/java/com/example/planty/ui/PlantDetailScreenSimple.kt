@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,25 +29,25 @@ import kotlinx.datetime.until
 @Composable
 fun PlantDetailScreenSimple(
     plantViewModel: PlantViewModel,
-    onHomeClick: () -> Unit
+    onBackClick: () -> Unit
 ) {
     val selectedPlant by plantViewModel.selectedPlant
 
     Scaffold(
-        containerColor = Color.White,
+        containerColor = Color(0xFFF8F9FA),
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        selectedPlant?.name ?: "Plant Details",
+                        text = selectedPlant?.name ?: "Plant Details",
                         fontWeight = FontWeight.Bold
                     )
                 },
-                actions = {
-                    IconButton(onClick = onHomeClick) {
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
                         Icon(
-                            Icons.Default.Home,
-                            contentDescription = "Home",
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
                             tint = Color.White
                         )
                     }
@@ -198,8 +199,8 @@ fun PlantDetailScreenSimple(
                 ) {
                     Text("No plant selected")
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = onHomeClick) {
-                        Text("Go Home")
+                    Button(onClick = onBackClick) {
+                        Text("Go Back")
                     }
                 }
             }
