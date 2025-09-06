@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+**/obj/**
+**/bin/**
+
+**/*.db
+**/*.db-shm
+**/*.db-wal
