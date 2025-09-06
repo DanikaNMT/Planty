@@ -20,20 +20,32 @@ public class PlantsControllerTests : IClassFixture<WebApplicationFactory<Program
         {
             builder.ConfigureServices(services =>
             {
-                // Remove the real database context
-                var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<PlantDbContext>));
+                // Remove the app's DbContext configuration
+                var descriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(DbContextOptions<PlantDbContext>));
                 if (descriptor != null)
                 {
                     services.Remove(descriptor);
                 }
 
-                // Add in-memory database for testing
+                // Remove the app's DbContext registration
+                var contextDescriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(PlantDbContext));
+                if (contextDescriptor != null)
+                {
+                    services.Remove(contextDescriptor);
+                }
+
+                // Add DbContext using in-memory database
                 services.AddDbContext<PlantDbContext>(options =>
                 {
-                    options.UseInMemoryDatabase("TestDb");
+                    options.UseInMemoryDatabase("TestDb")
+                           .UseInternalServiceProvider(new ServiceCollection()
+                                .AddEntityFrameworkInMemoryDatabase()
+                                .BuildServiceProvider());
                 });
 
-                // Build the service provider
+                // Create a new service provider
                 var sp = services.BuildServiceProvider();
 
                 // Create a scope to obtain a reference to the database context
@@ -41,7 +53,8 @@ public class PlantsControllerTests : IClassFixture<WebApplicationFactory<Program
                 var scopedServices = scope.ServiceProvider;
                 var db = scopedServices.GetRequiredService<PlantDbContext>();
 
-                // Ensure the database is created
+                // Ensure the database is created and clean
+                db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
             });
         });
