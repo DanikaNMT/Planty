@@ -1,4 +1,4 @@
-namespace PlantApp.Application;
+namespace Planty.Application;
 
 using FluentValidation;
 using MediatR;

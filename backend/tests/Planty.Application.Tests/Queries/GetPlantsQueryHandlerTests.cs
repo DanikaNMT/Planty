@@ -1,10 +1,10 @@
-namespace PlantApp.Application.Tests.Queries;
+namespace Planty.Application.Tests.Queries;
 
 using FluentAssertions;
 using Moq;
-using PlantApp.Application.Queries.GetPlants;
-using PlantApp.Domain.Entities;
-using PlantApp.Domain.Repositories;
+using Planty.Application.Queries.GetPlants;
+using Planty.Domain.Entities;
+using Planty.Domain.Repositories;
 
 public class GetPlantsQueryHandlerTests
 {

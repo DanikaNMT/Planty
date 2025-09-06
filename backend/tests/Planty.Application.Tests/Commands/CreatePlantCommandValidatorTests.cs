@@ -1,8 +1,8 @@
-namespace PlantApp.Application.Tests.Commands;
+namespace Planty.Application.Tests.Commands;
 
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using PlantApp.Application.Commands.CreatePlant;
+using Planty.Application.Commands.CreatePlant;
 
 public class CreatePlantCommandValidatorTests
 {

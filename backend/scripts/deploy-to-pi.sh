@@ -3,15 +3,15 @@
 # Configuration
 PI_IP="192.168.1.100"  # Replace with your Pi's IP
 PI_USER="pi"
-APP_NAME="plantapp"
+APP_NAME="planty"
 LOCAL_PUBLISH_DIR="./publish"
-REMOTE_DIR="/home/pi/plantapp"
+REMOTE_DIR="/home/pi/planty"
 
 echo "🌱 Starting Plant App deployment to Raspberry Pi..."
 
 # Build and publish for ARM64
 echo "📦 Building and publishing for ARM64..."
-dotnet publish src/PlantApp.API/PlantApp.API.csproj \
+dotnet publish src/Planty.API/Planty.API.csproj \
   -c Release \
   -r linux-arm64 \
   --self-contained \
@@ -33,11 +33,11 @@ ssh $PI_USER@$PI_IP "mkdir -p $REMOTE_DIR/data"
 scp -r $LOCAL_PUBLISH_DIR/* $PI_USER@$PI_IP:$REMOTE_DIR/
 
 # Set permissions
-ssh $PI_USER@$PI_IP "chmod +x $REMOTE_DIR/PlantApp.API"
+ssh $PI_USER@$PI_IP "chmod +x $REMOTE_DIR/Planty.API"
 
 # Create or update systemd service
 echo "⚙️  Setting up systemd service..."
-cat << EOF > /tmp/plantapp.service
+cat << EOF > /tmp/planty.service
 [Unit]
 Description=Plant App Backend API
 After=network.target
@@ -47,10 +47,10 @@ Type=notify
 User=$PI_USER
 Group=$PI_USER
 WorkingDirectory=$REMOTE_DIR
-ExecStart=$REMOTE_DIR/PlantApp.API
+ExecStart=$REMOTE_DIR/Planty.API
 Restart=always
 RestartSec=10
-SyslogIdentifier=plantapp
+SyslogIdentifier=planty
 Environment=ASPNETCORE_ENVIRONMENT=Production
 Environment=ASPNETCORE_URLS=http://0.0.0.0:5000
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
@@ -59,8 +59,8 @@ Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 WantedBy=multi-user.target
 EOF
 
-scp /tmp/plantapp.service $PI_USER@$PI_IP:/tmp/
-ssh $PI_USER@$PI_IP "sudo mv /tmp/plantapp.service /etc/systemd/system/ && sudo systemctl daemon-reload"
+scp /tmp/planty.service $PI_USER@$PI_IP:/tmp/
+ssh $PI_USER@$PI_IP "sudo mv /tmp/planty.service /etc/systemd/system/ && sudo systemctl daemon-reload"
 
 # Start the service
 echo "🎯 Starting Plant App service..."
@@ -76,7 +76,7 @@ echo "📖 API Documentation: http://$PI_IP:5000/swagger"
 
 # Clean up local publish directory
 rm -rf $LOCAL_PUBLISH_DIR
-rm /tmp/plantapp.service
+rm /tmp/planty.service
 
 # scripts/setup-dev.sh
 #!/bin/bash
@@ -89,7 +89,7 @@ dotnet restore
 
 # Create initial migration
 echo "🗄️  Creating initial database migration..."
-cd src/PlantApp.API
+cd src/Planty.API
 dotnet ef migrations add InitialCreate --context PlantDbContext
 
 # Update database
@@ -97,5 +97,5 @@ echo "📊 Updating database..."
 dotnet ef database update --context PlantDbContext
 
 echo "✅ Development environment setup complete!"
-echo "🚀 Run 'dotnet run' in src/PlantApp.API to start the API"
+echo "🚀 Run 'dotnet run' in src/Planty.API to start the API"
 echo "🧪 Run 'dotnet test' from the root to run all tests"

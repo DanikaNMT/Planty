@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  plantapp-api:
+  planty-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:

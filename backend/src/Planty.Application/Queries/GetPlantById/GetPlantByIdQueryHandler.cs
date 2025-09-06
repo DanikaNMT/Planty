@@ -1,9 +1,9 @@
-namespace PlantApp.Application.Queries.GetPlantById;
+namespace Planty.Application.Queries.GetPlantById;
 
 using MediatR;
-using PlantApp.Contracts.Plants;
-using PlantApp.Domain.Entities;
-using PlantApp.Domain.Repositories;
+using Planty.Contracts.Plants;
+using Planty.Domain.Entities;
+using Planty.Domain.Repositories;
 
 public class GetPlantByIdQueryHandler : IRequestHandler<GetPlantByIdQuery, PlantResponse?>
 {

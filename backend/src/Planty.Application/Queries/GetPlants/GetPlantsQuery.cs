@@ -1,6 +1,6 @@
-namespace PlantApp.Application.Queries.GetPlants;
+namespace Planty.Application.Queries.GetPlants;
 
 using MediatR;
-using PlantApp.Contracts.Plants;
+using Planty.Contracts.Plants;
 
 public record GetPlantsQuery : IRequest<IEnumerable<PlantResponse>>;

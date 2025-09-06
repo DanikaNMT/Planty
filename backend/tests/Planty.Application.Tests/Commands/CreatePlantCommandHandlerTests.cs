@@ -1,10 +1,10 @@
-namespace PlantApp.Application.Tests.Commands;
+namespace Planty.Application.Tests.Commands;
 
 using FluentAssertions;
 using Moq;
-using PlantApp.Application.Commands.CreatePlant;
-using PlantApp.Domain.Entities;
-using PlantApp.Domain.Repositories;
+using Planty.Application.Commands.CreatePlant;
+using Planty.Domain.Entities;
+using Planty.Domain.Repositories;
 
 public class CreatePlantCommandHandlerTests
 {

@@ -1,4 +1,4 @@
-namespace PlantApp.Application.Commands.CreatePlant;
+namespace Planty.Application.Commands.CreatePlant;
 
 using FluentValidation;
 

@@ -1,11 +1,11 @@
-namespace PlantApp.API.Tests.Controllers;
+namespace Planty.API.Tests.Controllers;
 
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using PlantApp.Contracts.Plants;
-using PlantApp.Infrastructure.Data;
+using Planty.Contracts.Plants;
+using Planty.Infrastructure.Data;
 using System.Net.Http.Json;
 using System.Text.Json;
 

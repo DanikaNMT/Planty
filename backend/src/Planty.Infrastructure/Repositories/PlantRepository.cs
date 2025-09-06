@@ -1,9 +1,9 @@
-namespace PlantApp.Infrastructure.Repositories;
+namespace Planty.Infrastructure.Repositories;
 
 using Microsoft.EntityFrameworkCore;
-using PlantApp.Domain.Entities;
-using PlantApp.Domain.Repositories;
-using PlantApp.Infrastructure.Data;
+using Planty.Domain.Entities;
+using Planty.Domain.Repositories;
+using Planty.Infrastructure.Data;
 
 public class PlantRepository : IPlantRepository
 {

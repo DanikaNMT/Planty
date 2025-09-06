@@ -1,9 +1,9 @@
-namespace PlantApp.Application.Queries.GetPlants;
+namespace Planty.Application.Queries.GetPlants;
 
 using MediatR;
-using PlantApp.Contracts.Plants;
-using PlantApp.Domain.Entities;
-using PlantApp.Domain.Repositories;
+using Planty.Contracts.Plants;
+using Planty.Domain.Entities;
+using Planty.Domain.Repositories;
 
 public class GetPlantsQueryHandler : IRequestHandler<GetPlantsQuery, IEnumerable<PlantResponse>>
 {

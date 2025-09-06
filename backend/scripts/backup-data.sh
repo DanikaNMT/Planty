@@ -10,9 +10,9 @@ echo "💾 Backing up Plant App data..."
 mkdir -p $BACKUP_DIR
 
 # Backup database
-scp $PI_USER@$PI_IP:/home/pi/plantapp/data/plants.db "$BACKUP_DIR/plants_$DATE.db"
+scp $PI_USER@$PI_IP:/home/pi/planty/data/plants.db "$BACKUP_DIR/plants_$DATE.db"
 
 # Backup any uploaded images (if you addded later)
-# scp -r $PI_USER@$PI_IP:/home/pi/plantapp/data/images/ "$BACKUP_DIR/images_$DATE/"
+# scp -r $PI_USER@$PI_IP:/home/pi/planty/data/images/ "$BACKUP_DIR/images_$DATE/"
 
 echo "✅ Backup complete: $BACKUP_DIR/plants_$DATE.db"

@@ -1,11 +1,11 @@
-namespace PlantApp.API.Controllers;
+namespace Planty.API.Controllers;
 
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using PlantApp.Application.Commands.CreatePlant;
-using PlantApp.Application.Queries.GetPlantById;
-using PlantApp.Application.Queries.GetPlants;
-using PlantApp.Contracts.Plants;
+using Planty.Application.Commands.CreatePlant;
+using Planty.Application.Queries.GetPlantById;
+using Planty.Application.Queries.GetPlants;
+using Planty.Contracts.Plants;
 
 [ApiController]
 [Route("api/[controller]")]

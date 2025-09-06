@@ -4,19 +4,19 @@ EXPOSE 5000
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["src/PlantApp.API/PlantApp.API.csproj", "src/PlantApp.API/"]
-COPY ["src/PlantApp.Application/PlantApp.Application.csproj", "src/PlantApp.Application/"]
-COPY ["src/PlantApp.Contracts/PlantApp.Contracts.csproj", "src/PlantApp.Contracts/"]
-COPY ["src/PlantApp.Domain/PlantApp.Domain.csproj", "src/PlantApp.Domain/"]
-COPY ["src/PlantApp.Infrastructure/PlantApp.Infrastructure.csproj", "src/PlantApp.Infrastructure/"]
+COPY ["src/Planty.API/Planty.API.csproj", "src/Planty.API/"]
+COPY ["src/Planty.Application/Planty.Application.csproj", "src/Planty.Application/"]
+COPY ["src/Planty.Contracts/Planty.Contracts.csproj", "src/Planty.Contracts/"]
+COPY ["src/Planty.Domain/Planty.Domain.csproj", "src/Planty.Domain/"]
+COPY ["src/Planty.Infrastructure/Planty.Infrastructure.csproj", "src/Planty.Infrastructure/"]
 
-RUN dotnet restore "src/PlantApp.API/PlantApp.API.csproj"
+RUN dotnet restore "src/Planty.API/Planty.API.csproj"
 COPY . .
-WORKDIR "/src/src/PlantApp.API"
-RUN dotnet build "PlantApp.API.csproj" -c Release -o /app/build
+WORKDIR "/src/src/Planty.API"
+RUN dotnet build "Planty.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "PlantApp.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Planty.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
@@ -29,4 +29,4 @@ VOLUME ["/app/data"]
 ENV ASPNETCORE_URLS=http://+:5000
 ENV ASPNETCORE_ENVIRONMENT=Production
 
-ENTRYPOINT ["dotnet", "PlantApp.API.dll"]
+ENTRYPOINT ["dotnet", "Planty.API.dll"]

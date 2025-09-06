@@ -1,5 +1,5 @@
-using PlantApp.Application;
-using PlantApp.Infrastructure;
+using Planty.Application;
+using Planty.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +43,7 @@ app.MapControllers();
 // Ensure database is created
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<PlantApp.Infrastructure.Data.PlantDbContext>();
+    var context = scope.ServiceProvider.GetRequiredService<Planty.Infrastructure.Data.PlantDbContext>();
     context.Database.EnsureCreated();
 }
 

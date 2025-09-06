@@ -1,9 +1,9 @@
-namespace PlantApp.Application.Commands.CreatePlant;
+namespace Planty.Application.Commands.CreatePlant;
 
 using MediatR;
-using PlantApp.Contracts.Plants;
-using PlantApp.Domain.Entities;
-using PlantApp.Domain.Repositories;
+using Planty.Contracts.Plants;
+using Planty.Domain.Entities;
+using Planty.Domain.Repositories;
 
 public class CreatePlantCommandHandler : IRequestHandler<CreatePlantCommand, PlantResponse>
 {

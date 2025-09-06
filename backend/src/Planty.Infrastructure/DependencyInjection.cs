@@ -1,11 +1,11 @@
-namespace PlantApp.Infrastructure;
+namespace Planty.Infrastructure;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PlantApp.Domain.Repositories;
-using PlantApp.Infrastructure.Data;
-using PlantApp.Infrastructure.Repositories;
+using Planty.Domain.Repositories;
+using Planty.Infrastructure.Data;
+using Planty.Infrastructure.Repositories;
 
 public static class DependencyInjection
 {

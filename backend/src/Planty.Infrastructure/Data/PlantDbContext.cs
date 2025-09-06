@@ -1,7 +1,7 @@
-namespace PlantApp.Infrastructure.Data;
+namespace Planty.Infrastructure.Data;
 
 using Microsoft.EntityFrameworkCore;
-using PlantApp.Domain.Entities;
+using Planty.Domain.Entities;
 
 public class PlantDbContext : DbContext
 {

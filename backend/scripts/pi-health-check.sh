@@ -8,7 +8,7 @@ echo "========================"
 
 # Check if service is running
 echo "📊 Service Status:"
-ssh pi@$PI_IP "sudo systemctl is-active plantapp"
+ssh pi@$PI_IP "sudo systemctl is-active planty"
 
 # Check API endpoint
 echo "🌐 API Health Check:"
@@ -20,4 +20,4 @@ fi
 
 # Check logs
 echo "📝 Recent logs:"
-ssh pi@$PI_IP "sudo journalctl -u plantapp --no-pager -n 10"
+ssh pi@$PI_IP "sudo journalctl -u planty --no-pager -n 10"
