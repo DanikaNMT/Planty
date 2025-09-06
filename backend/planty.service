@@ -1,0 +1,16 @@
+[Unit]
+Description=Plant App Backend
+After=network.target
+
+[Service]
+Type=notify
+User=pi
+WorkingDirectory=/home/pi/planty
+ExecStart=/home/pi/planty/Planty.API
+Restart=always
+RestartSec=10
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=ASPNETCORE_URLS=http://0.0.0.0:5000
+
+[Install]
+WantedBy=multi-user.target

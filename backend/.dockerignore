@@ -1,0 +1,15 @@
+**/bin
+**/obj
+**/.git
+**/.gitignore
+**/Dockerfile*
+**/docker-compose*
+**/.dockerignore
+**/README.md
+**/.vs
+**/.vscode
+**/node_modules
+**/npm-debug.log
+**/publish
+**/backups
+**/scripts
