@@ -36,7 +36,7 @@ if (-not (Test-Path "node_modules")) {
 
 # Build the React app for production
 Write-Host "Building React app for production..." -ForegroundColor Yellow
-$env:VITE_API_URL = $ApiUrl
+$env:VITE_API_BASE = $ApiUrl
 npm run build
 
 if ($LASTEXITCODE -ne 0) {

@@ -12,8 +12,8 @@ export default defineConfig({
       }
     }
   },
-  // Define environment variables for the build
+  // Environment variables will be available as import.meta.env.VITE_API_BASE
   define: {
-    __API_URL__: JSON.stringify(process.env.VITE_API_URL || 'http://localhost:5153')
+    'import.meta.env.VITE_API_BASE': JSON.stringify(process.env.VITE_API_BASE || 'http://localhost:5153')
   }
 });
