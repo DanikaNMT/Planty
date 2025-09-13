@@ -1,0 +1,77 @@
+name: Deploy Api
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v5
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore backend/src/Planty.API/Planty.API.csproj
+    
+    - name: Build
+      run: dotnet build backend/src/Planty.API/Planty.API.csproj --no-restore --configuration Release
+    
+    - name: Test
+      run: dotnet test backend/src/Planty.API/Planty.API.csproj --no-build --configuration Release --verbosity normal
+    
+    - name: Publish
+      run: dotnet publish backend/src/Planty.API/Planty.API.csproj --no-build --configuration Release --output ./publish --runtime linux-arm64 --self-contained false
+    
+    - name: Create deployment archive
+      run: |
+        cd publish
+        tar -czf ../planty-api.tar.gz *
+        cd ..
+    
+    - name: Copy files to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.RPI_HOST }}
+        username: ${{ secrets.RPI_USERNAME }}
+        key: ${{ secrets.RPI_SSH_KEY }}
+        source: "planty-api.tar.gz"
+        target: "/home/${{ secrets.RPI_USERNAME }}/deployments/"
+    
+    - name: Deploy on server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.RPI_HOST }}
+        username: ${{ secrets.RPI_USERNAME }}
+        key: ${{ secrets.RPI_SSH_KEY }}
+        script: |
+          # Stop the existing service
+          sudo systemctl stop planty-api || true
+          
+          # Backup current deployment
+          sudo rm -rf /opt/planty-api-backup || true
+          sudo cp -r /opt/planty-api /opt/planty-api-backup || true
+          
+          # Extract new deployment
+          cd /home/${{ secrets.RPI_USERNAME }}/deployments/
+          sudo rm -rf /opt/planty-api || true
+          sudo mkdir -p /opt/planty-api
+          sudo tar -xzf planty-api.tar.gz -C /opt/planty-api
+          
+          # Set permissions
+          sudo chown -R ${{ secrets.RPI_USERNAME }}:${{ secrets.RPI_USERNAME }} /opt/planty-api
+          sudo chmod +x /opt/planty-api/Planty.API
+          
+          # Start the service
+          sudo systemctl start planty-api
+          sudo systemctl enable planty-api
+          
+          # Check if service is running
+          sleep 5
+          sudo systemctl is-active planty-api
