@@ -18,6 +18,9 @@ public static class DependencyInjection
 
         services.AddScoped<IPlantRepository, PlantRepository>();
 
+        // Register MediatR handlers from this assembly (for WaterPlantCommandHandler)
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
+
         return services;
     }
 }

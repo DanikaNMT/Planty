@@ -40,11 +40,14 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created
-using (var scope = app.Services.CreateScope())
+// Ensure database is created (skip in Testing environment)
+if (!app.Environment.IsEnvironment("Testing"))
 {
-    var context = scope.ServiceProvider.GetRequiredService<Planty.Infrastructure.Data.PlantDbContext>();
-    context.Database.EnsureCreated();
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<Planty.Infrastructure.Data.PlantDbContext>();
+        context.Database.EnsureCreated();
+    }
 }
 
 app.Run();

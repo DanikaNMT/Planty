@@ -1,6 +1,7 @@
 namespace Planty.API.Tests.Controllers;
 
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,57 +10,20 @@ using Planty.Infrastructure.Data;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-public class PlantsControllerTests : IClassFixture<WebApplicationFactory<Program>>
+public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public PlantsControllerTests(WebApplicationFactory<Program> factory)
+    public PlantsControllerTests(CustomWebApplicationFactory factory)
     {
-        _factory = factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
-            {
-                // Remove the app's DbContext configuration
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<PlantDbContext>));
-                if (descriptor != null)
-                {
-                    services.Remove(descriptor);
-                }
-
-                // Remove the app's DbContext registration
-                var contextDescriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(PlantDbContext));
-                if (contextDescriptor != null)
-                {
-                    services.Remove(contextDescriptor);
-                }
-
-                // Add DbContext using in-memory database
-                services.AddDbContext<PlantDbContext>(options =>
-                {
-                    options.UseInMemoryDatabase("TestDb")
-                           .UseInternalServiceProvider(new ServiceCollection()
-                                .AddEntityFrameworkInMemoryDatabase()
-                                .BuildServiceProvider());
-                });
-
-                // Create a new service provider
-                var sp = services.BuildServiceProvider();
-
-                // Create a scope to obtain a reference to the database context
-                using var scope = sp.CreateScope();
-                var scopedServices = scope.ServiceProvider;
-                var db = scopedServices.GetRequiredService<PlantDbContext>();
-
-                // Ensure the database is created and clean
-                db.Database.EnsureDeleted();
-                db.Database.EnsureCreated();
-            });
-        });
-
+        _factory = factory;
         _client = _factory.CreateClient();
+
+        // Ensure the database is created and seeded for each test
+        using var scope = _factory.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<PlantDbContext>();
+        context.Database.EnsureCreated();
     }
 
     [Fact]

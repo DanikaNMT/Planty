@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Planty.Application.Commands.CreatePlant;
 using Planty.Application.Queries.GetPlantById;
 using Planty.Application.Queries.GetPlants;
+using Planty.Application.Commands.WaterPlant;
 using Planty.Contracts.Plants;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/plants")]
 public class PlantsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -62,5 +63,19 @@ public class PlantsController : ControllerBase
             nameof(GetPlant), 
             new { id = result.Id }, 
             result);
+    }
+    [HttpPost("{id:guid}/water")]
+    public async Task<ActionResult<PlantResponse>> WaterPlant(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var command = new WaterPlantCommand(id);
+            var result = await _mediator.Send(command, cancellationToken);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
     }
 }
