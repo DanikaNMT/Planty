@@ -27,7 +27,7 @@ jobs:
       run: dotnet test backend/src/Planty.API/Planty.API.csproj --no-build --configuration Release --verbosity normal
     
     - name: Publish
-      run: dotnet publish backend/src/Planty.API/Planty.API.csproj --configuration Release --output ./publish --runtime linux-arm64 --self-contained false
+      run: dotnet publish backend/src/Planty.API/Planty.API.csproj --configuration Release --output ./publish --runtime linux-arm --self-contained false
     
     - name: Create deployment archive
       run: |

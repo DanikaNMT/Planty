@@ -11,5 +11,9 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  // Define environment variables for the build
+  define: {
+    __API_URL__: JSON.stringify(process.env.VITE_API_URL || 'http://localhost:5153')
   }
 });
