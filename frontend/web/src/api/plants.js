@@ -20,3 +20,9 @@ export function createPlant(data) {
     })
   });
 }
+
+export function waterPlant(id) {
+  return apiFetch(`/api/plants/${id}/water`, {
+    method: 'POST'
+  });
+}
