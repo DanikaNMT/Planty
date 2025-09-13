@@ -22,7 +22,8 @@ public class CreatePlantCommandHandler : IRequestHandler<CreatePlantCommand, Pla
             Species = request.Species,
             Description = request.Description,
             WateringIntervalDays = request.WateringIntervalDays,
-            Location = request.Location
+            Location = request.Location,
+            UserId = request.UserId
         };
 
         var createdPlant = await _plantRepository.AddAsync(plant, cancellationToken);

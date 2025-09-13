@@ -19,9 +19,10 @@ namespace Planty.Application.Commands.WaterPlant
 
         public async Task<PlantResponse> Handle(WaterPlantCommand request, CancellationToken cancellationToken)
         {
+
             var plant = await _plantRepository.GetByIdAsync(request.PlantId, cancellationToken);
-            if (plant == null)
-                throw new Exception($"Plant with id {request.PlantId} not found");
+            if (plant == null || plant.UserId != request.UserId)
+                throw new Exception($"Plant with id {request.PlantId} not found for this user");
 
             plant.LastWatered = DateTime.UtcNow;
             await _plantRepository.UpdateAsync(plant, cancellationToken);

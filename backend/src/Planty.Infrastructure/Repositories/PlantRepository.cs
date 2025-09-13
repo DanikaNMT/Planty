@@ -20,9 +20,18 @@ public class PlantRepository : IPlantRepository
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
+
     public async Task<IEnumerable<Plant>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Plants
+            .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<Plant>> GetAllByUserAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Plants
+            .Where(p => p.UserId == userId)
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
     }

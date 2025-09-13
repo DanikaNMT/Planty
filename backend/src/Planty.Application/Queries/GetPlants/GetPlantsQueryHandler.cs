@@ -16,7 +16,7 @@ public class GetPlantsQueryHandler : IRequestHandler<GetPlantsQuery, IEnumerable
 
     public async Task<IEnumerable<PlantResponse>> Handle(GetPlantsQuery request, CancellationToken cancellationToken)
     {
-        var plants = await _plantRepository.GetAllAsync(cancellationToken);
+        var plants = await _plantRepository.GetAllByUserAsync(request.UserId, cancellationToken);
         return plants.Select(MapToResponse);
     }
 

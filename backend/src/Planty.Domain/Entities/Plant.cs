@@ -11,4 +11,8 @@ public class Plant
     public int WateringIntervalDays { get; set; } = 7;
     public string? Location { get; set; }
     public string? ImageUrl { get; set; }
+
+    // User relationship
+    public Guid UserId { get; set; }
+    public User User { get; set; } = null!;
 }

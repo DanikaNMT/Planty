@@ -17,7 +17,9 @@ public class GetPlantByIdQueryHandler : IRequestHandler<GetPlantByIdQuery, Plant
     public async Task<PlantResponse?> Handle(GetPlantByIdQuery request, CancellationToken cancellationToken)
     {
         var plant = await _plantRepository.GetByIdAsync(request.Id, cancellationToken);
-        return plant == null ? null : MapToResponse(plant);
+        if (plant == null || plant.UserId != request.UserId)
+            return null;
+        return MapToResponse(plant);
     }
 
     private static PlantResponse MapToResponse(Plant plant)

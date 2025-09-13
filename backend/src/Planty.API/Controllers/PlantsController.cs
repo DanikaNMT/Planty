@@ -8,8 +8,12 @@ using Planty.Application.Queries.GetPlants;
 using Planty.Application.Commands.WaterPlant;
 using Planty.Contracts.Plants;
 
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+
 [ApiController]
 [Route("api/plants")]
+[Authorize]
 public class PlantsController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -20,56 +24,50 @@ public class PlantsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PlantResponse>>> GetPlants(
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<PlantResponse>>> GetPlants(CancellationToken cancellationToken)
     {
-        var query = new GetPlantsQuery();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        var query = new GetPlantsQuery(Guid.Parse(userId));
         var result = await _mediator.Send(query, cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<PlantResponse>> GetPlant(
-        Guid id, 
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<PlantResponse>> GetPlant(Guid id, CancellationToken cancellationToken)
     {
-        var query = new GetPlantByIdQuery(id);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        var query = new GetPlantByIdQuery(id, Guid.Parse(userId));
         var result = await _mediator.Send(query, cancellationToken);
-        
-        if (result == null)
-        {
-            return NotFound();
-        }
-
+        if (result == null) return NotFound();
         return Ok(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<PlantResponse>> CreatePlant(
-        CreatePlantRequest request, 
-        CancellationToken cancellationToken)
+    public async Task<ActionResult<PlantResponse>> CreatePlant(CreatePlantRequest request, CancellationToken cancellationToken)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
         var command = new CreatePlantCommand(
             request.Name,
             request.Species,
             request.Description,
             request.WateringIntervalDays,
-            request.Location
+            request.Location,
+            Guid.Parse(userId)
         );
-
         var result = await _mediator.Send(command, cancellationToken);
-        
-        return CreatedAtAction(
-            nameof(GetPlant), 
-            new { id = result.Id }, 
-            result);
+        return CreatedAtAction(nameof(GetPlant), new { id = result.Id }, result);
     }
     [HttpPost("{id:guid}/water")]
     public async Task<ActionResult<PlantResponse>> WaterPlant(Guid id, CancellationToken cancellationToken)
     {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
         try
         {
-            var command = new WaterPlantCommand(id);
+            var command = new WaterPlantCommand(id, Guid.Parse(userId));
             var result = await _mediator.Send(command, cancellationToken);
             return Ok(result);
         }

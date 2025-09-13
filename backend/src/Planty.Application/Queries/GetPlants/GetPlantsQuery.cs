@@ -3,4 +3,4 @@ namespace Planty.Application.Queries.GetPlants;
 using MediatR;
 using Planty.Contracts.Plants;
 
-public record GetPlantsQuery : IRequest<IEnumerable<PlantResponse>>;
+public record GetPlantsQuery(Guid UserId) : IRequest<IEnumerable<PlantResponse>>;
