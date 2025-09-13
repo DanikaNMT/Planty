@@ -6,7 +6,7 @@ param(
     [string]$OutputPath = "C:\Users\arnod\repos\Planty\frontend-publish",
     [string]$PiHost = "raspberrypi.local",
     [string]$PiUser = "deploy",
-    [string]$ApiUrl = "http://raspberrypi.local:5000"
+    [string]$ApiUrl = "https://planty.arnodece.com"
 )
 
 Write-Host "Starting frontend build and deployment..." -ForegroundColor Green

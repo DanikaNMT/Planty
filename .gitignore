@@ -22,3 +22,5 @@ local.properties
 **/*.db-wal
 
 **/node_modules/**
+**/publish/**
+**/frontend-publish/**
