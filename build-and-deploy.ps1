@@ -30,6 +30,12 @@ dotnet build --configuration Release --no-restore
 Write-Host "Publishing for Linux ARM (32-bit)..." -ForegroundColor Yellow
 dotnet publish --configuration Release --output $OutputPath --runtime linux-arm --self-contained true --no-build
 
+Write-Host "Publishing migration tool..." -ForegroundColor Yellow
+Set-Location "C:\Users\arnod\repos\Planty\backend\src\Planty.MigrationTool"
+dotnet publish --configuration Release --output $OutputPath --runtime linux-arm --self-contained true
+
+# Config files are already in the output directory from the API publish
+
 # Create archive
 Write-Host "Creating deployment archive..." -ForegroundColor Yellow
 Set-Location $OutputPath

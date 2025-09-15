@@ -29,8 +29,11 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
     [Fact]
     public async Task GetPlants_ReturnsEmptyList_WhenNoPlants()
     {
+        // Arrange
+        var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
+        
         // Act
-        var response = await _client.GetAsync("/api/plants");
+        var response = await authenticatedClient.GetAsync("/api/plants");
         
         // Assert
         response.EnsureSuccessStatusCode();
@@ -43,16 +46,17 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
     public async Task CreatePlant_ReturnsCreatedPlant()
     {
         // Arrange
+        var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
         var request = new CreatePlantRequest(
             "Test Plant",
             "Test Species",
             "Test Description",
             7,
-            "Test Location"
+            null // LocationId
         );
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/plants", request);
+        var response = await authenticatedClient.PostAsJsonAsync("/api/plants", request);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -62,17 +66,18 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
         plant.Species.Should().Be(request.Species);
         plant.Description.Should().Be(request.Description);
         plant.WateringIntervalDays.Should().Be(request.WateringIntervalDays);
-        plant.Location.Should().Be(request.Location);
+        plant.Location.Should().BeNull(); // Since LocationId is null, Location name should be null
     }
 
     [Fact]
     public async Task GetPlantById_ReturnsNotFound_WhenPlantDoesNotExist()
     {
         // Arrange
+        var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
         var nonExistentId = Guid.NewGuid();
 
         // Act
-        var response = await _client.GetAsync($"/api/plants/{nonExistentId}");
+        var response = await authenticatedClient.GetAsync($"/api/plants/{nonExistentId}");
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);

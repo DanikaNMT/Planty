@@ -1,6 +1,14 @@
 #!/bin/bash
 # /opt/planty-scripts/deploy-app.sh
 # Script to handle application deployment
+# 
+# This script:
+# 1. Stops the service
+# 2. Creates a backup of the current deployment
+# 3. Extracts the new deployment
+# 4. Applies database migrations (EF Core)
+# 5. Starts the service
+# 6. Verifies deployment success or rolls back
 
 set -e  # Exit on any error
 
@@ -30,6 +38,22 @@ tar -xzf $DEPLOY_DIR/planty-api.tar.gz -C $APP_DIR
 echo "Setting permissions..."
 chown -R planty:planty $APP_DIR
 chmod +x $APP_DIR/Planty.API
+chmod +x $APP_DIR/Planty.MigrationTool
+
+# Apply database migrations
+echo "Applying database migrations..."
+cd $APP_DIR
+# For development: completely reset database if migration fails
+sudo -u planty ./Planty.MigrationTool || {
+        echo "Migration failed! Restoring backup..."
+        systemctl stop $SERVICE_NAME || true
+        rm -rf $APP_DIR || true
+        cp -r $BACKUP_DIR $APP_DIR || true
+        chown -R planty:planty $APP_DIR || true
+        chmod +x $APP_DIR/Planty.API || true
+        systemctl start $SERVICE_NAME || true
+        exit 1
+}
 
 # Start the service
 echo "Starting service..."

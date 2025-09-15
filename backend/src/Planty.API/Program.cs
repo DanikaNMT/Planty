@@ -1,9 +1,11 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Planty.Application;
 using Planty.Infrastructure;
+using Planty.Infrastructure.Data;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -101,13 +103,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created (skip in Testing environment)
+// Ensure database migrations are applied (skip in Testing environment)
 if (!app.Environment.IsEnvironment("Testing"))
 {
     using (var scope = app.Services.CreateScope())
     {
-        var context = scope.ServiceProvider.GetRequiredService<Planty.Infrastructure.Data.PlantDbContext>();
-        context.Database.EnsureCreated();
+        var context = scope.ServiceProvider.GetRequiredService<PlantDbContext>();
+        context.Database.Migrate();
     }
 }
 

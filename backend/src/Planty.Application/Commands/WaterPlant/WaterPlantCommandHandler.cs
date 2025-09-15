@@ -38,7 +38,7 @@ namespace Planty.Application.Commands.WaterPlant
                 plant.DateAdded,
                 plant.LastWatered,
                 plant.WateringIntervalDays,
-                plant.Location,
+                plant.Location?.Name,
                 plant.ImageUrl,
                 nextWateringDue
             );

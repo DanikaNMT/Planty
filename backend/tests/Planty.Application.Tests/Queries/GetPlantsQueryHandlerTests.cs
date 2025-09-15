@@ -21,17 +21,18 @@ public class GetPlantsQueryHandlerTests
     public async Task Handle_ReturnsAllPlants()
     {
         // Arrange
+        var userId = Guid.NewGuid();
         var plants = new List<Plant>
         {
-            new() { Id = Guid.NewGuid(), Name = "Plant 1", Species = "Species 1", WateringIntervalDays = 7 },
-            new() { Id = Guid.NewGuid(), Name = "Plant 2", Species = "Species 2", WateringIntervalDays = 5 }
+            new() { Id = Guid.NewGuid(), Name = "Plant 1", Species = "Species 1", WateringIntervalDays = 7, UserId = userId },
+            new() { Id = Guid.NewGuid(), Name = "Plant 2", Species = "Species 2", WateringIntervalDays = 5, UserId = userId }
         };
 
         _mockRepository
-            .Setup(r => r.GetAllAsync(It.IsAny<CancellationToken>()))
+            .Setup(r => r.GetAllByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(plants);
 
-        var query = new GetPlantsQuery();
+        var query = new GetPlantsQuery(userId);
 
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
@@ -41,6 +42,6 @@ public class GetPlantsQueryHandlerTests
         result.Should().Contain(p => p.Name == "Plant 1");
         result.Should().Contain(p => p.Name == "Plant 2");
 
-        _mockRepository.Verify(r => r.GetAllAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockRepository.Verify(r => r.GetAllByUserAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
     }
 }

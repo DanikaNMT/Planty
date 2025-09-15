@@ -21,12 +21,14 @@ public class CreatePlantCommandHandlerTests
     public async Task Handle_ValidCommand_ReturnsPlantResponse()
     {
         // Arrange
+        var userId = Guid.NewGuid();
         var command = new CreatePlantCommand(
             "Test Plant",
             "Test Species",
             "Test Description",
             7,
-            "Living Room"
+            null, // LocationId
+            userId
         );
 
         var plant = new Plant
@@ -36,8 +38,9 @@ public class CreatePlantCommandHandlerTests
             Species = command.Species,
             Description = command.Description,
             WateringIntervalDays = command.WateringIntervalDays,
-            Location = command.Location,
-            DateAdded = DateTime.UtcNow
+            LocationId = command.LocationId,
+            DateAdded = DateTime.UtcNow,
+            UserId = userId
         };
 
         _mockRepository
@@ -53,7 +56,7 @@ public class CreatePlantCommandHandlerTests
         result.Species.Should().Be(command.Species);
         result.Description.Should().Be(command.Description);
         result.WateringIntervalDays.Should().Be(command.WateringIntervalDays);
-        result.Location.Should().Be(command.Location);
+        result.Location.Should().BeNull(); // Since LocationId is null, Location name should be null
 
         _mockRepository.Verify(r => r.AddAsync(It.IsAny<Plant>(), It.IsAny<CancellationToken>()), Times.Once);
         _mockRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
