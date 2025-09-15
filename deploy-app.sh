@@ -38,19 +38,21 @@ tar -xzf $DEPLOY_DIR/planty-api.tar.gz -C $APP_DIR
 echo "Setting permissions..."
 chown -R planty:planty $APP_DIR
 chmod +x $APP_DIR/Planty.API
+chmod +x $APP_DIR/Planty.MigrationTool
 
 # Apply database migrations
 echo "Applying database migrations..."
 cd $APP_DIR
-sudo -u planty dotnet Planty.API.dll --migrate || {
-    echo "Migration failed! Restoring backup..."
-    systemctl stop $SERVICE_NAME || true
-    rm -rf $APP_DIR || true
-    cp -r $BACKUP_DIR $APP_DIR || true
-    chown -R planty:planty $APP_DIR || true
-    chmod +x $APP_DIR/Planty.API || true
-    systemctl start $SERVICE_NAME || true
-    exit 1
+# For development: completely reset database if migration fails
+sudo -u planty ./Planty.MigrationTool || {
+        echo "Migration failed! Restoring backup..."
+        systemctl stop $SERVICE_NAME || true
+        rm -rf $APP_DIR || true
+        cp -r $BACKUP_DIR $APP_DIR || true
+        chown -R planty:planty $APP_DIR || true
+        chmod +x $APP_DIR/Planty.API || true
+        systemctl start $SERVICE_NAME || true
+        exit 1
 }
 
 # Start the service

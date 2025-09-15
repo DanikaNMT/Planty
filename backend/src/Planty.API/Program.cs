@@ -10,23 +10,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Check for migration command
-if (args.Length > 0 && args[0] == "--migrate")
-{
-    // Build minimal services for migration
-    builder.Services.AddInfrastructure(builder.Configuration);
-    var migrationApp = builder.Build();
-    
-    using (var scope = migrationApp.Services.CreateScope())
-    {
-        var context = scope.ServiceProvider.GetRequiredService<PlantDbContext>();
-        Console.WriteLine("Applying database migrations...");
-        context.Database.Migrate();
-        Console.WriteLine("Database migrations applied successfully.");
-    }
-    return;
-}
-
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
