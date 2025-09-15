@@ -44,7 +44,7 @@ namespace Planty.Infrastructure.Data.Migrations
             migrationBuilder.Sql(@"
                 INSERT INTO Locations (Id, Name, UserId)
                 SELECT 
-                    lower(hex(randomblob(16))),
+                    lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-' || '4' || substr(lower(hex(randomblob(2))),2) || '-' || 'a' || substr(lower(hex(randomblob(2))),2) || '-' || lower(hex(randomblob(6))),
                     Location,
                     UserId
                 FROM (
