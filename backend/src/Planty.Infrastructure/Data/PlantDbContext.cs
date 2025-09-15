@@ -50,6 +50,7 @@ public class PlantDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.IsDefault).IsRequired().HasDefaultValue(false);
 
             entity.HasOne(e => e.User)
                   .WithMany(u => u.Locations)

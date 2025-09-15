@@ -5,6 +5,7 @@ public class Location
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public bool IsDefault { get; set; } = false;
 
     // User relationship
     public Guid UserId { get; set; }

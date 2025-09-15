@@ -37,6 +37,17 @@ namespace Planty.API.Controllers
                 PasswordHash = HashPassword(request.Password)
             };
             _dbContext.Users.Add(user);
+
+            // Create default "Home" location for the new user
+            var defaultLocation = new Location
+            {
+                Name = "Home",
+                Description = "Default home location",
+                IsDefault = true,
+                UserId = user.Id
+            };
+            _dbContext.Locations.Add(defaultLocation);
+
             await _dbContext.SaveChangesAsync();
             return Ok(new { message = "Registration successful." });
         }

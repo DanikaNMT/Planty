@@ -17,6 +17,7 @@ public static class DependencyInjection
             options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IPlantRepository, PlantRepository>();
+        services.AddScoped<ILocationRepository, LocationRepository>();
 
         // Register MediatR handlers from this assembly (for WaterPlantCommandHandler)
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
