@@ -10,7 +10,8 @@ namespace Planty.API.Tests.Controllers
         [Fact]
         public async Task WaterPlant_ReturnsOkAndUpdatesLastWatered()
         {
-            // Arrange: create a plant
+            // Arrange: create a plant with authenticated client
+            var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
             var request = new CreatePlantRequest(
                 "Watered Plant",
                 "Species",
@@ -18,13 +19,13 @@ namespace Planty.API.Tests.Controllers
                 3,
                 "Location"
             );
-            var createResponse = await _client.PostAsJsonAsync("/api/plants", request);
+            var createResponse = await authenticatedClient.PostAsJsonAsync("/api/plants", request);
             createResponse.EnsureSuccessStatusCode();
             var plant = await createResponse.Content.ReadFromJsonAsync<PlantResponse>();
             plant.Should().NotBeNull();
 
             // Act: water the plant
-            var waterResponse = await _client.PostAsync($"/api/plants/{plant!.Id}/water", null);
+            var waterResponse = await authenticatedClient.PostAsync($"/api/plants/{plant!.Id}/water", null);
             waterResponse.EnsureSuccessStatusCode();
             var wateredPlant = await waterResponse.Content.ReadFromJsonAsync<PlantResponse>();
 
@@ -37,8 +38,11 @@ namespace Planty.API.Tests.Controllers
         [Fact]
         public async Task WaterPlant_ReturnsNotFound_ForInvalidId()
         {
+            // Arrange
+            var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
+            
             // Act
-            var response = await _client.PostAsync($"/api/plants/{Guid.NewGuid()}/water", null);
+            var response = await authenticatedClient.PostAsync($"/api/plants/{Guid.NewGuid()}/water", null);
 
             // Assert
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);

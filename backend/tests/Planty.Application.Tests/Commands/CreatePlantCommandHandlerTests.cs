@@ -21,12 +21,14 @@ public class CreatePlantCommandHandlerTests
     public async Task Handle_ValidCommand_ReturnsPlantResponse()
     {
         // Arrange
+        var userId = Guid.NewGuid();
         var command = new CreatePlantCommand(
             "Test Plant",
             "Test Species",
             "Test Description",
             7,
-            "Living Room"
+            "Living Room",
+            userId
         );
 
         var plant = new Plant
@@ -37,7 +39,8 @@ public class CreatePlantCommandHandlerTests
             Description = command.Description,
             WateringIntervalDays = command.WateringIntervalDays,
             Location = command.Location,
-            DateAdded = DateTime.UtcNow
+            DateAdded = DateTime.UtcNow,
+            UserId = userId
         };
 
         _mockRepository

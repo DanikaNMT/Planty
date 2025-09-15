@@ -29,8 +29,11 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
     [Fact]
     public async Task GetPlants_ReturnsEmptyList_WhenNoPlants()
     {
+        // Arrange
+        var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
+        
         // Act
-        var response = await _client.GetAsync("/api/plants");
+        var response = await authenticatedClient.GetAsync("/api/plants");
         
         // Assert
         response.EnsureSuccessStatusCode();
@@ -43,6 +46,7 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
     public async Task CreatePlant_ReturnsCreatedPlant()
     {
         // Arrange
+        var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
         var request = new CreatePlantRequest(
             "Test Plant",
             "Test Species",
@@ -52,7 +56,7 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
         );
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/plants", request);
+        var response = await authenticatedClient.PostAsJsonAsync("/api/plants", request);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -69,10 +73,11 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
     public async Task GetPlantById_ReturnsNotFound_WhenPlantDoesNotExist()
     {
         // Arrange
+        var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
         var nonExistentId = Guid.NewGuid();
 
         // Act
-        var response = await _client.GetAsync($"/api/plants/{nonExistentId}");
+        var response = await authenticatedClient.GetAsync($"/api/plants/{nonExistentId}");
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
