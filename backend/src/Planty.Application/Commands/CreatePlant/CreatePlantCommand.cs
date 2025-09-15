@@ -8,6 +8,6 @@ public record CreatePlantCommand(
     string Species,
     string? Description,
     int WateringIntervalDays,
-    string? Location,
+    Guid? LocationId,
     Guid UserId
 ) : IRequest<PlantResponse>;

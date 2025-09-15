@@ -52,7 +52,7 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
             "Test Species",
             "Test Description",
             7,
-            "Test Location"
+            null // LocationId
         );
 
         // Act
@@ -66,7 +66,7 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
         plant.Species.Should().Be(request.Species);
         plant.Description.Should().Be(request.Description);
         plant.WateringIntervalDays.Should().Be(request.WateringIntervalDays);
-        plant.Location.Should().Be(request.Location);
+        plant.Location.Should().BeNull(); // Since LocationId is null, Location name should be null
     }
 
     [Fact]

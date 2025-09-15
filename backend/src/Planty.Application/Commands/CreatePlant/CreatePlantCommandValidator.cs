@@ -25,10 +25,5 @@ public class CreatePlantCommandValidator : AbstractValidator<CreatePlantCommand>
             .MaximumLength(500)
             .When(x => !string.IsNullOrEmpty(x.Description))
             .WithMessage("Description must not exceed 500 characters");
-
-        RuleFor(x => x.Location)
-            .MaximumLength(100)
-            .When(x => !string.IsNullOrEmpty(x.Location))
-            .WithMessage("Location must not exceed 100 characters");
     }
 }

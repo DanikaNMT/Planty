@@ -17,7 +17,7 @@ namespace Planty.API.Tests.Controllers
                 "Species",
                 "Desc",
                 3,
-                "Location"
+                null // LocationId
             );
             var createResponse = await authenticatedClient.PostAsJsonAsync("/api/plants", request);
             createResponse.EnsureSuccessStatusCode();

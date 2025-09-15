@@ -27,7 +27,7 @@ public class CreatePlantCommandHandlerTests
             "Test Species",
             "Test Description",
             7,
-            "Living Room",
+            null, // LocationId
             userId
         );
 
@@ -38,7 +38,7 @@ public class CreatePlantCommandHandlerTests
             Species = command.Species,
             Description = command.Description,
             WateringIntervalDays = command.WateringIntervalDays,
-            Location = command.Location,
+            LocationId = command.LocationId,
             DateAdded = DateTime.UtcNow,
             UserId = userId
         };
@@ -56,7 +56,7 @@ public class CreatePlantCommandHandlerTests
         result.Species.Should().Be(command.Species);
         result.Description.Should().Be(command.Description);
         result.WateringIntervalDays.Should().Be(command.WateringIntervalDays);
-        result.Location.Should().Be(command.Location);
+        result.Location.Should().BeNull(); // Since LocationId is null, Location name should be null
 
         _mockRepository.Verify(r => r.AddAsync(It.IsAny<Plant>(), It.IsAny<CancellationToken>()), Times.Once);
         _mockRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);

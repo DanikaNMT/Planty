@@ -17,6 +17,7 @@ public class PlantRepository : IPlantRepository
     public async Task<Plant?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Plants
+            .Include(p => p.Location)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -24,6 +25,7 @@ public class PlantRepository : IPlantRepository
     public async Task<IEnumerable<Plant>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Plants
+            .Include(p => p.Location)
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
     }
@@ -31,6 +33,7 @@ public class PlantRepository : IPlantRepository
     public async Task<IEnumerable<Plant>> GetAllByUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Plants
+            .Include(p => p.Location)
             .Where(p => p.UserId == userId)
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);

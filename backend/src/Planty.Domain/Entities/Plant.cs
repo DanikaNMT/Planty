@@ -9,10 +9,13 @@ public class Plant
     public DateTime DateAdded { get; set; } = DateTime.UtcNow;
     public DateTime? LastWatered { get; set; }
     public int WateringIntervalDays { get; set; } = 7;
-    public string? Location { get; set; }
     public string? ImageUrl { get; set; }
 
     // User relationship
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
+
+    // Location relationship
+    public Guid? LocationId { get; set; }
+    public Location? Location { get; set; }
 }

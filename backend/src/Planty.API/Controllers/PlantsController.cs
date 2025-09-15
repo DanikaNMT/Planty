@@ -54,7 +54,7 @@ public class PlantsController : ControllerBase
             request.Species,
             request.Description,
             request.WateringIntervalDays,
-            request.Location,
+            request.LocationId,
             Guid.Parse(userId)
         );
         var result = await _mediator.Send(command, cancellationToken);

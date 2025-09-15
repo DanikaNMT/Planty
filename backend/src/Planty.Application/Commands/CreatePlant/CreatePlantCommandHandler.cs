@@ -22,7 +22,7 @@ public class CreatePlantCommandHandler : IRequestHandler<CreatePlantCommand, Pla
             Species = request.Species,
             Description = request.Description,
             WateringIntervalDays = request.WateringIntervalDays,
-            Location = request.Location,
+            LocationId = request.LocationId,
             UserId = request.UserId
         };
 
@@ -45,7 +45,7 @@ public class CreatePlantCommandHandler : IRequestHandler<CreatePlantCommand, Pla
             plant.DateAdded,
             plant.LastWatered,
             plant.WateringIntervalDays,
-            plant.Location,
+            plant.Location?.Name,
             plant.ImageUrl,
             nextWateringDue
         );

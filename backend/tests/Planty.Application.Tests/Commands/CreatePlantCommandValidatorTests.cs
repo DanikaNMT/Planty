@@ -48,7 +48,7 @@ public class CreatePlantCommandValidatorTests
     [Fact]
     public void Should_Not_Have_Error_When_Valid_Command()
     {
-        var command = new CreatePlantCommand("Valid Name", "Valid Species", "Valid Description", 7, "Valid Location", Guid.NewGuid());
+        var command = new CreatePlantCommand("Valid Name", "Valid Species", "Valid Description", 7, null, Guid.NewGuid());
         var result = _validator.TestValidate(command);
         result.ShouldNotHaveAnyValidationErrors();
     }

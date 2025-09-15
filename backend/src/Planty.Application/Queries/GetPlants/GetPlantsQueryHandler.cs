@@ -33,7 +33,7 @@ public class GetPlantsQueryHandler : IRequestHandler<GetPlantsQuery, IEnumerable
             plant.DateAdded,
             plant.LastWatered,
             plant.WateringIntervalDays,
-            plant.Location,
+            plant.Location?.Name,
             plant.ImageUrl,
             nextWateringDue
         );

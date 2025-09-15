@@ -7,4 +7,5 @@ public class User
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
     public ICollection<Plant> Plants { get; set; } = new List<Plant>();
+    public ICollection<Location> Locations { get; set; } = new List<Location>();
 }
