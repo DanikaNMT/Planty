@@ -4,6 +4,7 @@ import { HomePage } from './pages/HomePage.jsx';
 import { PlantDetailPage } from './pages/PlantDetailPage.jsx';
 import { NewPlantPage } from './pages/NewPlantPage.jsx';
 import { AuthPage } from './pages/AuthPage.jsx';
+import './App.css'
 
 export default function App() {
   const { route, navigate } = useRouter();
