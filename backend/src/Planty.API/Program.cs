@@ -1,12 +1,31 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Planty.Application;
 using Planty.Infrastructure;
+using Planty.Infrastructure.Data;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Check for migration command
+if (args.Length > 0 && args[0] == "--migrate")
+{
+    // Build minimal services for migration
+    builder.Services.AddInfrastructure(builder.Configuration);
+    var migrationApp = builder.Build();
+    
+    using (var scope = migrationApp.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<PlantDbContext>();
+        Console.WriteLine("Applying database migrations...");
+        context.Database.Migrate();
+        Console.WriteLine("Database migrations applied successfully.");
+    }
+    return;
+}
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -101,13 +120,13 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created (skip in Testing environment)
+// Ensure database migrations are applied (skip in Testing environment)
 if (!app.Environment.IsEnvironment("Testing"))
 {
     using (var scope = app.Services.CreateScope())
     {
-        var context = scope.ServiceProvider.GetRequiredService<Planty.Infrastructure.Data.PlantDbContext>();
-        context.Database.EnsureCreated();
+        var context = scope.ServiceProvider.GetRequiredService<PlantDbContext>();
+        context.Database.Migrate();
     }
 }
 
