@@ -52,6 +52,7 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
             "Test Species",
             "Test Description",
             7,
+            null, // FertilizationIntervalDays
             null // LocationId
         );
 
@@ -79,6 +80,7 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
             null, // Species
             null, // Description
             null, // WateringIntervalDays
+            null, // FertilizationIntervalDays
             null  // LocationId
         );
 

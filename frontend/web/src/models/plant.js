@@ -10,6 +10,9 @@
  * @property {string | null} location
  * @property {string | null} imageUrl
  * @property {string | null} nextWateringDue
+ * @property {string | null} lastFertilized
+ * @property {number | null} fertilizationIntervalDays
+ * @property {string | null} nextFertilizationDue
  */
 
 /**
@@ -20,10 +23,18 @@
  */
 
 /**
+ * @typedef {Object} Fertilization
+ * @property {string} id
+ * @property {string} fertilizedAt
+ * @property {string | null} notes
+ */
+
+/**
  * @typedef {Object} CreatePlantRequest
  * @property {string} name
  * @property {string | null} species
  * @property {string | null} description
  * @property {number | null} wateringIntervalDays
+ * @property {number | null} fertilizationIntervalDays
  * @property {string | null} location
  */

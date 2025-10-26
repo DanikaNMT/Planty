@@ -8,6 +8,7 @@ public class Plant
     public string? Description { get; set; }
     public DateTime DateAdded { get; set; } = DateTime.UtcNow;
     public int? WateringIntervalDays { get; set; }
+    public int? FertilizationIntervalDays { get; set; }
     public string? ImageUrl { get; set; }
 
     // User relationship
@@ -20,4 +21,7 @@ public class Plant
 
     // Watering history
     public ICollection<Watering> Waterings { get; set; } = new List<Watering>();
+    
+    // Fertilization history
+    public ICollection<Fertilization> Fertilizations { get; set; } = new List<Fertilization>();
 }

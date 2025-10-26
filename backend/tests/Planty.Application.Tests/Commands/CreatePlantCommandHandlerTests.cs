@@ -27,6 +27,7 @@ public class CreatePlantCommandHandlerTests
             "Test Species",
             "Test Description",
             7,
+            null, // FertilizationIntervalDays
             null, // LocationId
             userId
         );

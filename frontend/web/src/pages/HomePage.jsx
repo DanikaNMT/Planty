@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPlants, waterPlant } from '../api/plants.js';
+import { getPlants, waterPlant, fertilizePlant } from '../api/plants.js';
 import Link from '../components/Link.jsx';
 import { Loading } from '../components/Loading.jsx';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
@@ -10,7 +10,9 @@ export function HomePage({ navigate }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [wateringStates, setWateringStates] = useState({});
+  const [fertilizingStates, setFertilizingStates] = useState({});
   const [waterSuccess, setWaterSuccess] = useState(null);
+  const [fertilizeSuccess, setFertilizeSuccess] = useState(null);
 
   function load() {
     setLoading(true);
@@ -27,6 +29,7 @@ export function HomePage({ navigate }) {
     setWateringStates(prev => ({ ...prev, [plantId]: true }));
     setError(null);
     setWaterSuccess(null);
+    setFertilizeSuccess(null);
     
     try {
       const updatedPlant = await waterPlant(plantId);
@@ -39,6 +42,28 @@ export function HomePage({ navigate }) {
       setError(e.message);
     } finally {
       setWateringStates(prev => ({ ...prev, [plantId]: false }));
+    }
+  };
+
+  const handleFertilizePlant = async (plantId, plantName) => {
+    if (fertilizingStates[plantId]) return;
+    
+    setFertilizingStates(prev => ({ ...prev, [plantId]: true }));
+    setError(null);
+    setWaterSuccess(null);
+    setFertilizeSuccess(null);
+    
+    try {
+      const updatedPlant = await fertilizePlant(plantId);
+      // Update the plant in the list
+      setPlants(prev => prev.map(p => p.id === plantId ? updatedPlant : p));
+      setFertilizeSuccess(plantName);
+      // Clear success message after 3 seconds
+      setTimeout(() => setFertilizeSuccess(null), 3000);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setFertilizingStates(prev => ({ ...prev, [plantId]: false }));
     }
   };
 
@@ -65,6 +90,12 @@ export function HomePage({ navigate }) {
         </div>
       )}
       
+      {fertilizeSuccess && (
+        <div>
+          {fertilizeSuccess} fertilized successfully! 🌿
+        </div>
+      )}
+      
       <div>
         {plants.map(p => (
           <div key={p.id}>
@@ -80,12 +111,26 @@ export function HomePage({ navigate }) {
                   Next watering: {formatDate(p.nextWateringDue)}
                 </div>
               )}
+              <div>
+                Last fertilized: {p.lastFertilized ? formatDate(p.lastFertilized) : 'Never'}
+              </div>
+              {p.nextFertilizationDue && (
+                <div>
+                  Next fertilization: {formatDate(p.nextFertilizationDue)}
+                </div>
+              )}
             </div>
             <button
               onClick={() => handleWaterPlant(p.id, p.name)}
               disabled={wateringStates[p.id]}
             >
               {wateringStates[p.id] ? 'Watering...' : '💧 Water'}
+            </button>
+            <button
+              onClick={() => handleFertilizePlant(p.id, p.name)}
+              disabled={fertilizingStates[p.id]}
+            >
+              {fertilizingStates[p.id] ? 'Fertilizing...' : '🌿 Fertilize'}
             </button>
           </div>
         ))}

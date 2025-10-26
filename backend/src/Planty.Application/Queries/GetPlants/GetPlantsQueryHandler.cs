@@ -1,6 +1,7 @@
 namespace Planty.Application.Queries.GetPlants;
 
 using MediatR;
+using Planty.Application.Common;
 using Planty.Contracts.Plants;
 using Planty.Domain.Entities;
 using Planty.Domain.Repositories;
@@ -17,34 +18,6 @@ public class GetPlantsQueryHandler : IRequestHandler<GetPlantsQuery, IEnumerable
     public async Task<IEnumerable<PlantResponse>> Handle(GetPlantsQuery request, CancellationToken cancellationToken)
     {
         var plants = await _plantRepository.GetAllByUserAsync(request.UserId, cancellationToken);
-        return plants.Select(MapToResponse);
-    }
-
-    private static PlantResponse MapToResponse(Plant plant)
-    {
-        var lastWatered = plant.Waterings.OrderByDescending(w => w.WateredAt).FirstOrDefault()?.WateredAt;
-        
-        DateTime? nextWateringDue = null;
-        if (plant.WateringIntervalDays.HasValue && lastWatered.HasValue)
-        {
-            nextWateringDue = lastWatered.Value.AddDays(plant.WateringIntervalDays.Value);
-        }
-        else if (plant.WateringIntervalDays.HasValue)
-        {
-            nextWateringDue = plant.DateAdded.AddDays(plant.WateringIntervalDays.Value);
-        }
-
-        return new PlantResponse(
-            plant.Id,
-            plant.Name,
-            plant.Species,
-            plant.Description,
-            plant.DateAdded,
-            lastWatered,
-            plant.WateringIntervalDays,
-            plant.Location?.Name,
-            plant.ImageUrl,
-            nextWateringDue
-        );
+        return plants.Select(PlantMapper.MapToResponse);
     }
 }

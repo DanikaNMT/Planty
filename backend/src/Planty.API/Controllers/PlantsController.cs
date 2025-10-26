@@ -3,9 +3,12 @@ namespace Planty.API.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Planty.Application.Commands.CreatePlant;
+using Planty.Application.Commands.FertilizePlant;
 using Planty.Application.Queries.GetPlantById;
 using Planty.Application.Queries.GetPlants;
 using Planty.Application.Queries.GetPlantWaterings;
+using Planty.Application.Queries.GetPlantFertilizations;
+using Planty.Application.Queries.GetPlantCareHistory;
 using Planty.Application.Commands.WaterPlant;
 using Planty.Contracts.Plants;
 
@@ -55,6 +58,7 @@ public class PlantsController : ControllerBase
             request.Species,
             request.Description,
             request.WateringIntervalDays,
+            request.FertilizationIntervalDays,
             request.LocationId,
             Guid.Parse(userId)
         );
@@ -84,6 +88,43 @@ public class PlantsController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null) return Unauthorized();
         var query = new GetPlantWateringsQuery(id, Guid.Parse(userId));
+        var result = await _mediator.Send(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpPost("{id:guid}/fertilize")]
+    public async Task<ActionResult<PlantResponse>> FertilizePlant(Guid id, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        try
+        {
+            var command = new FertilizePlantCommand(id, Guid.Parse(userId));
+            var result = await _mediator.Send(command, cancellationToken);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("{id:guid}/fertilizations")]
+    public async Task<ActionResult<IEnumerable<FertilizationResponse>>> GetPlantFertilizations(Guid id, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        var query = new GetPlantFertilizationsQuery(id, Guid.Parse(userId));
+        var result = await _mediator.Send(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("{id:guid}/care-history")]
+    public async Task<ActionResult<IEnumerable<CareEventResponse>>> GetPlantCareHistory(Guid id, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        var query = new GetPlantCareHistoryQuery(id, Guid.Parse(userId));
         var result = await _mediator.Send(query, cancellationToken);
         return Ok(result);
     }

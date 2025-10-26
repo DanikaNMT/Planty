@@ -22,6 +22,12 @@ public class CreatePlantCommandValidator : AbstractValidator<CreatePlantCommand>
             .When(x => x.WateringIntervalDays.HasValue)
             .WithMessage("Watering interval must be between 1 and 365 days");
 
+        RuleFor(x => x.FertilizationIntervalDays)
+            .GreaterThan(0)
+            .LessThanOrEqualTo(365)
+            .When(x => x.FertilizationIntervalDays.HasValue)
+            .WithMessage("Fertilization interval must be between 1 and 365 days");
+
         RuleFor(x => x.Description)
             .MaximumLength(500)
             .When(x => !string.IsNullOrEmpty(x.Description))

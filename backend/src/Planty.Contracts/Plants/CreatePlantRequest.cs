@@ -5,5 +5,6 @@ public record CreatePlantRequest(
     string? Species,
     string? Description,
     int? WateringIntervalDays,
+    int? FertilizationIntervalDays,
     Guid? LocationId
 );

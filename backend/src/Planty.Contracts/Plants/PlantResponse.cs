@@ -10,5 +10,8 @@ public record PlantResponse(
     int? WateringIntervalDays,
     string? Location,
     string? ImageUrl,
-    DateTime? NextWateringDue
+    DateTime? NextWateringDue,
+    DateTime? LastFertilized,
+    int? FertilizationIntervalDays,
+    DateTime? NextFertilizationDue
 );

@@ -17,6 +17,7 @@ namespace Planty.API.Tests.Controllers
                 "Species",
                 "Desc",
                 3,
+                null, // FertilizationIntervalDays
                 null // LocationId
             );
             var createResponse = await authenticatedClient.PostAsJsonAsync("/api/plants", request);

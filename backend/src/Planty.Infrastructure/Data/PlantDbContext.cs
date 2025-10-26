@@ -12,6 +12,7 @@ public class PlantDbContext : DbContext
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Location> Locations { get; set; } = null!;
     public DbSet<Watering> Waterings { get; set; } = null!;
+    public DbSet<Fertilization> Fertilizations { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +27,7 @@ public class PlantDbContext : DbContext
             entity.Property(e => e.ImageUrl).HasMaxLength(500);
             entity.Property(e => e.DateAdded).IsRequired();
             entity.Property(e => e.WateringIntervalDays);
+            entity.Property(e => e.FertilizationIntervalDays);
 
             entity.HasOne(e => e.User)
                   .WithMany(u => u.Plants)
@@ -41,6 +43,11 @@ public class PlantDbContext : DbContext
                   .WithOne(w => w.Plant)
                   .HasForeignKey(w => w.PlantId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(e => e.Fertilizations)
+                  .WithOne(f => f.Plant)
+                  .HasForeignKey(f => f.PlantId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Watering>(entity =>
@@ -49,6 +56,14 @@ public class PlantDbContext : DbContext
             entity.Property(e => e.WateredAt).IsRequired();
             entity.Property(e => e.Notes).HasMaxLength(500);
             entity.HasIndex(e => new { e.PlantId, e.WateredAt });
+        });
+
+        modelBuilder.Entity<Fertilization>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.FertilizedAt).IsRequired();
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.HasIndex(e => new { e.PlantId, e.FertilizedAt });
         });
 
         modelBuilder.Entity<User>(entity =>

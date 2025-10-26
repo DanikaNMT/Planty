@@ -2,18 +2,20 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Planty.Application.Common;
 using Planty.Contracts.Plants;
 using Planty.Domain.Entities;
 using Planty.Domain.Repositories;
 
 namespace Planty.Application.Commands.WaterPlant
 {
-    public class WaterPlantCommandHandler : IRequestHandler<WaterPlantCommand, PlantResponse>
+    public class WaterPlantCommandHandler : CareActionHandler<Watering>, IRequestHandler<WaterPlantCommand, PlantResponse>
     {
         private readonly IPlantRepository _plantRepository;
         private readonly IWateringRepository _wateringRepository;
 
         public WaterPlantCommandHandler(IPlantRepository plantRepository, IWateringRepository wateringRepository)
+            : base(plantRepository)
         {
             _plantRepository = plantRepository;
             _wateringRepository = wateringRepository;
@@ -22,9 +24,7 @@ namespace Planty.Application.Commands.WaterPlant
         public async Task<PlantResponse> Handle(WaterPlantCommand request, CancellationToken cancellationToken)
         {
 
-            var plant = await _plantRepository.GetByIdAsync(request.PlantId, cancellationToken);
-            if (plant == null || plant.UserId != request.UserId)
-                throw new Exception($"Plant with id {request.PlantId} not found for this user");
+            var plant = await ValidatePlantOwnershipAsync(request.PlantId, request.UserId, cancellationToken);
 
             // Create a new watering record
             var watering = new Watering
@@ -36,25 +36,11 @@ namespace Planty.Application.Commands.WaterPlant
             await _wateringRepository.AddAsync(watering, cancellationToken);
             await _wateringRepository.SaveChangesAsync(cancellationToken);
 
-            // Calculate next watering due
-            DateTime? nextWateringDue = null;
-            if (plant.WateringIntervalDays.HasValue)
-            {
-                nextWateringDue = watering.WateredAt.AddDays(plant.WateringIntervalDays.Value);
-            }
+            // Manually update the plant's Waterings collection to include the new watering
+            // This ensures PlantMapper gets the latest data
+            plant.Waterings.Add(watering);
 
-            return new PlantResponse(
-                plant.Id,
-                plant.Name,
-                plant.Species,
-                plant.Description,
-                plant.DateAdded,
-                watering.WateredAt,  // Use the new watering record's timestamp
-                plant.WateringIntervalDays,
-                plant.Location?.Name,
-                plant.ImageUrl,
-                nextWateringDue
-            );
+            return PlantMapper.MapToResponse(plant);
         }
     }
 }

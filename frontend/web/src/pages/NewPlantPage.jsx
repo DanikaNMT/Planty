@@ -4,7 +4,7 @@ import { ErrorMessage } from '../components/ErrorMessage.jsx';
 import { Loading } from '../components/Loading.jsx';
 
 export function NewPlantPage({ navigate }) {
-  const [data, setData] = useState({ name: '', species: '', description: '', wateringIntervalDays: 7, location: '' });
+  const [data, setData] = useState({ name: '', species: '', description: '', wateringIntervalDays: 7, fertilizationIntervalDays: '', location: '' });
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState(null);
 
@@ -38,6 +38,10 @@ export function NewPlantPage({ navigate }) {
         <div>
           <label>Watering Interval Days </label>
           <input type="number" value={data.wateringIntervalDays} onChange={e => setData({ ...data, wateringIntervalDays: e.target.value })} />
+        </div>
+        <div>
+          <label>Fertilization Interval Days </label>
+          <input type="number" value={data.fertilizationIntervalDays} onChange={e => setData({ ...data, fertilizationIntervalDays: e.target.value })} />
         </div>
         <div>
           <label>Location </label>

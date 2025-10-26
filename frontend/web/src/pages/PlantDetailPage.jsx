@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPlant, waterPlant, getPlantWaterings } from '../api/plants.js';
+import { getPlant, waterPlant, fertilizePlant, getPlantCareHistory } from '../api/plants.js';
 import { Loading } from '../components/Loading.jsx';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
 import { formatDate } from '../utils/formatDate.js';
@@ -7,12 +7,14 @@ import Link from '../components/Link.jsx';
 
 export function PlantDetailPage({ id, navigate }) {
   const [plant, setPlant] = useState(null);
-  const [waterings, setWaterings] = useState([]);
+  const [careHistory, setCareHistory] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingWaterings, setLoadingWaterings] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const [error, setError] = useState(null);
   const [watering, setWatering] = useState(false);
+  const [fertilizing, setFertilizing] = useState(false);
   const [waterSuccess, setWaterSuccess] = useState(false);
+  const [fertilizeSuccess, setFertilizeSuccess] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -22,12 +24,12 @@ export function PlantDetailPage({ id, navigate }) {
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
     
-    // Load watering history
-    setLoadingWaterings(true);
-    getPlantWaterings(id)
-      .then(setWaterings)
-      .catch(e => console.error('Failed to load watering history:', e.message))
-      .finally(() => setLoadingWaterings(false));
+    // Load care history
+    setLoadingHistory(true);
+    getPlantCareHistory(id)
+      .then(setCareHistory)
+      .catch(e => console.error('Failed to load care history:', e.message))
+      .finally(() => setLoadingHistory(false));
   }, [id]);
 
   const handleWaterPlant = async () => {
@@ -36,20 +38,45 @@ export function PlantDetailPage({ id, navigate }) {
     setWatering(true);
     setError(null);
     setWaterSuccess(false);
+    setFertilizeSuccess(false);
     
     try {
       const updatedPlant = await waterPlant(id);
       setPlant(updatedPlant);
       setWaterSuccess(true);
-      // Reload watering history
-      const updatedWaterings = await getPlantWaterings(id);
-      setWaterings(updatedWaterings);
+      // Reload care history
+      const updatedHistory = await getPlantCareHistory(id);
+      setCareHistory(updatedHistory);
       // Clear success message after 3 seconds
       setTimeout(() => setWaterSuccess(false), 3000);
     } catch (e) {
       setError(e.message);
     } finally {
       setWatering(false);
+    }
+  };
+
+  const handleFertilizePlant = async () => {
+    if (fertilizing) return;
+    
+    setFertilizing(true);
+    setError(null);
+    setWaterSuccess(false);
+    setFertilizeSuccess(false);
+    
+    try {
+      const updatedPlant = await fertilizePlant(id);
+      setPlant(updatedPlant);
+      setFertilizeSuccess(true);
+      // Reload care history
+      const updatedHistory = await getPlantCareHistory(id);
+      setCareHistory(updatedHistory);
+      // Clear success message after 3 seconds
+      setTimeout(() => setFertilizeSuccess(false), 3000);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setFertilizing(false);
     }
   };
 
@@ -65,6 +92,12 @@ export function PlantDetailPage({ id, navigate }) {
       {waterSuccess && (
         <div>
           Plant watered successfully! 💧
+        </div>
+      )}
+      
+      {fertilizeSuccess && (
+        <div>
+          Plant fertilized successfully! 🌿
         </div>
       )}
 
@@ -109,6 +142,19 @@ export function PlantDetailPage({ id, navigate }) {
               <strong>Next Watering Due:</strong> {formatDate(plant.nextWateringDue)}
             </div>
           )}
+          <div>
+            <strong>Last Fertilized:</strong> {plant.lastFertilized ? formatDate(plant.lastFertilized) : 'Never'}
+          </div>
+          {plant.fertilizationIntervalDays && (
+            <div>
+              <strong>Fertilization Interval (days):</strong> {plant.fertilizationIntervalDays}
+            </div>
+          )}
+          {plant.nextFertilizationDue && (
+            <div>
+              <strong>Next Fertilization Due:</strong> {formatDate(plant.nextFertilizationDue)}
+            </div>
+          )}
           
           <div>
             <button
@@ -117,25 +163,32 @@ export function PlantDetailPage({ id, navigate }) {
             >
               {watering ? 'Watering...' : '💧 Water Plant'}
             </button>
+            <button
+              onClick={handleFertilizePlant}
+              disabled={fertilizing}
+              style={{ marginLeft: '10px' }}
+            >
+              {fertilizing ? 'Fertilizing...' : '🌿 Fertilize Plant'}
+            </button>
           </div>
 
-          {/* Watering History */}
+          {/* Care History */}
           <div style={{ marginTop: '30px' }}>
-            <h3>Watering History</h3>
-            {loadingWaterings && <p>Loading history...</p>}
-            {waterings.length === 0 && !loadingWaterings && (
-              <p>No watering history yet. Water your plant to start tracking!</p>
+            <h3>Care History</h3>
+            {loadingHistory && <p>Loading history...</p>}
+            {careHistory.length === 0 && !loadingHistory && (
+              <p>No care history yet. Water or fertilize your plant to start tracking!</p>
             )}
-            {waterings.length > 0 && (
+            {careHistory.length > 0 && (
               <ul style={{ listStyle: 'none', padding: 0 }}>
-                {waterings.map(w => (
-                  <li key={w.id} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                {careHistory.map(event => (
+                  <li key={event.id} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
                     <div>
-                      <strong>💧 Watered:</strong> {formatDate(w.wateredAt)}
+                      <strong>{event.type === 'Watering' ? '💧' : '🌿'} {event.type}:</strong> {formatDate(event.timestamp)}
                     </div>
-                    {w.notes && (
+                    {event.notes && (
                       <div style={{ marginTop: '5px', fontStyle: 'italic' }}>
-                        Note: {w.notes}
+                        Note: {event.notes}
                       </div>
                     )}
                   </li>

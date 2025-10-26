@@ -16,6 +16,7 @@ export function createPlant(data) {
       species: data.species || null,
       description: data.description || null,
       wateringIntervalDays: data.wateringIntervalDays ? Number(data.wateringIntervalDays) : null,
+      fertilizationIntervalDays: data.fertilizationIntervalDays ? Number(data.fertilizationIntervalDays) : null,
       location: data.location || null
     })
   });
@@ -29,4 +30,18 @@ export function waterPlant(id) {
 
 export function getPlantWaterings(id) {
   return apiFetch(`/api/plants/${id}/waterings`);
+}
+
+export function fertilizePlant(id) {
+  return apiFetch(`/api/plants/${id}/fertilize`, {
+    method: 'POST'
+  });
+}
+
+export function getPlantFertilizations(id) {
+  return apiFetch(`/api/plants/${id}/fertilizations`);
+}
+
+export function getPlantCareHistory(id) {
+  return apiFetch(`/api/plants/${id}/care-history`);
 }
