@@ -30,26 +30,68 @@ export function AuthPage({ onAuth, mode = 'login', switchMode }) {
   }
 
   return (
-    <div>
-      <h2>{mode === 'login' ? 'Login' : 'Register'}</h2>
-      <form onSubmit={handleSubmit}>
-        {mode === 'register' && (
-          <div>
-            <label>Username: <input value={userName} onChange={e => setUserName(e.target.value)} required /></label>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h2 className="auth-title">
+          <span>🌱</span>
+          Planty
+        </h2>
+        <p style={{ textAlign: 'center', color: 'var(--color-text-light)', marginBottom: 'var(--spacing-xl)' }}>
+          {mode === 'login' ? 'Welcome back! 👋' : 'Start your plant journey! 🌿'}
+        </p>
+        
+        <form onSubmit={handleSubmit}>
+          {mode === 'register' && (
+            <div className="form-group">
+              <label>👤 Username</label>
+              <input 
+                type="text"
+                value={userName} 
+                onChange={e => setUserName(e.target.value)} 
+                placeholder="Choose a username"
+                required 
+              />
+            </div>
+          )}
+          <div className="form-group">
+            <label>📧 Email</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={e => setEmail(e.target.value)} 
+              placeholder="your@email.com"
+              required 
+            />
+          </div>
+          <div className="form-group">
+            <label>🔒 Password</label>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              placeholder="Enter your password"
+              required 
+            />
+          </div>
+          
+          <button type="submit" disabled={loading} className="btn-large" style={{ width: '100%', marginBottom: 'var(--spacing-md)' }}>
+            {loading ? '⏳ Loading...' : (mode === 'login' ? '🔓 Login' : '🌱 Create Account')}
+          </button>
+        </form>
+        
+        {error && (
+          <div className="message message-error">
+            <span>⚠️</span>
+            {error}
           </div>
         )}
-        <div>
-          <label>Email: <input type="email" value={email} onChange={e => setEmail(e.target.value)} required /></label>
+        
+        <div style={{ textAlign: 'center', marginTop: 'var(--spacing-lg)' }}>
+          <button onClick={switchMode} className="btn-outline" style={{ width: '100%' }}>
+            {mode === 'login' ? '🌿 Need an account? Register' : '👋 Already have an account? Login'}
+          </button>
         </div>
-        <div>
-          <label>Password: <input type="password" value={password} onChange={e => setPassword(e.target.value)} required /></label>
-        </div>
-        <button type="submit" disabled={loading}>{loading ? 'Loading...' : (mode === 'login' ? 'Login' : 'Register')}</button>
-      </form>
-      {error && <div style={{color:'red'}}>{error}</div>}
-      <button onClick={switchMode}>
-        {mode === 'login' ? 'Need an account? Register' : 'Already have an account? Login'}
-      </button>
+      </div>
     </div>
   );
 }

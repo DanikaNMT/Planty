@@ -19,6 +19,8 @@ public class PlantRepository : IPlantRepository
         return await _context.Plants
             .Include(p => p.Location)
             .Include(p => p.Waterings.OrderByDescending(w => w.WateredAt).Take(1))
+            .Include(p => p.Fertilizations.OrderByDescending(f => f.FertilizedAt).Take(1))
+            .Include(p => p.Pictures.OrderByDescending(pic => pic.TakenAt).Take(1))
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
@@ -28,6 +30,8 @@ public class PlantRepository : IPlantRepository
         return await _context.Plants
             .Include(p => p.Location)
             .Include(p => p.Waterings.OrderByDescending(w => w.WateredAt).Take(1))
+            .Include(p => p.Fertilizations.OrderByDescending(f => f.FertilizedAt).Take(1))
+            .Include(p => p.Pictures.OrderByDescending(pic => pic.TakenAt).Take(1))
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);
     }
@@ -37,6 +41,8 @@ public class PlantRepository : IPlantRepository
         return await _context.Plants
             .Include(p => p.Location)
             .Include(p => p.Waterings.OrderByDescending(w => w.WateredAt).Take(1))
+            .Include(p => p.Fertilizations.OrderByDescending(f => f.FertilizedAt).Take(1))
+            .Include(p => p.Pictures.OrderByDescending(pic => pic.TakenAt).Take(1))
             .Where(p => p.UserId == userId)
             .OrderBy(p => p.Name)
             .ToListAsync(cancellationToken);

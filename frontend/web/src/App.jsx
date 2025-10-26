@@ -36,18 +36,26 @@ export default function App() {
       page = <NewPlantPage navigate={navigate} />; break;
     default:
       page = (
-        <div>
-          <div>Not Found</div>
-          <button onClick={() => navigate('/')}>Home</button>
+        <div className="empty-state">
+          <div className="empty-state-icon">🌵</div>
+          <h2 className="empty-state-title">Page Not Found</h2>
+          <p className="empty-state-message">Oops! This plant doesn't exist in our garden.</p>
+          <button onClick={() => navigate('/')}>🏡 Go Home</button>
         </div>
       );
   }
 
   return (
-    <div>
-      <div>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
+    <div className="app-container">
+      <header className="app-header">
+        <h1 className="app-title">
+          <span>🌱</span>
+          Planty
+        </h1>
+        <button onClick={handleLogout} className="btn-outline btn-small">
+          👋 Logout
+        </button>
+      </header>
       {page}
     </div>
   );

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { getPlants, waterPlant, fertilizePlant } from '../api/plants.js';
-import Link from '../components/Link.jsx';
-import { Loading } from '../components/Loading.jsx';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
 import { formatDate } from '../utils/formatDate.js';
 
@@ -71,77 +69,90 @@ export function HomePage({ navigate }) {
 
   return (
     <div>
-      <h1>Planty</h1>
-      <div>
-        <button onClick={load} disabled={loading}>
-          {loading ? 'Loading...' : 'Reload'}
-        </button>
-        <button onClick={() => navigate('/new')}>
-          Add Plant
-        </button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-xl)' }}>
+        <h2 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+          <span>🪴</span>
+          My Plants
+        </h2>
+        <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+          <button onClick={load} disabled={loading} className="btn-outline btn-small">
+            {loading ? '⏳ Loading...' : '🔄 Reload'}
+          </button>
+          <button onClick={() => navigate('/new')} className="btn-large">
+            ➕ Add Plant
+          </button>
+        </div>
       </div>
       
-      {loading && <Loading />}
+      {loading && (
+        <div className="loading">
+          <div className="spinner"></div>
+          Loading your plants...
+        </div>
+      )}
+      
       <ErrorMessage error={error} />
       
       {waterSuccess && (
-        <div>
-          {waterSuccess} watered successfully! 💧
+        <div className="message message-success">
+          <span>💧</span>
+          <strong>{waterSuccess}</strong> watered successfully!
         </div>
       )}
       
       {fertilizeSuccess && (
-        <div>
-          {fertilizeSuccess} fertilized successfully! 🌿
+        <div className="message message-success">
+          <span>🌿</span>
+          <strong>{fertilizeSuccess}</strong> fertilized successfully!
         </div>
       )}
       
       <div>
         {plants.map(p => (
-          <div key={p.id} style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '8px' }}>
+          <div 
+            key={p.id} 
+            className="plant-card"
+            onClick={() => navigate(`/plant/${p.id}`)}
+            style={{ cursor: 'pointer' }}
+          >
             {p.latestPictureUrl && (
-              <div style={{ flexShrink: 0 }}>
+              <div>
                 <img 
                   src={p.latestPictureUrl} 
                   alt={p.name}
-                  style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                  className="plant-card-image"
                   onError={(e) => { e.target.style.display = 'none'; }}
                 />
               </div>
             )}
-            <div style={{ flex: 1 }}>
-              <Link to={`/plant/${p.id}`} navigate={navigate}>
+            <div className="plant-card-content">
+              <div className="plant-card-title">
                 {p.name}{p.species ? ` - ${p.species}` : ''}
-              </Link>
-              <div>
-                Last watered: {p.lastWatered ? formatDate(p.lastWatered) : 'Never'}
               </div>
-              {p.nextWateringDue && (
-                <div>
-                  Next watering: {formatDate(p.nextWateringDue)}
-                </div>
-              )}
-              <div>
-                Last fertilized: {p.lastFertilized ? formatDate(p.lastFertilized) : 'Never'}
+              <div className="plant-info">
+                <div>💧 Last watered: <strong>{p.lastWatered ? formatDate(p.lastWatered) : 'Never'}</strong></div>
+                {p.nextWateringDue && (
+                  <div>⏰ Next watering: <strong>{formatDate(p.nextWateringDue)}</strong></div>
+                )}
+                <div>🌿 Last fertilized: <strong>{p.lastFertilized ? formatDate(p.lastFertilized) : 'Never'}</strong></div>
+                {p.nextFertilizationDue && (
+                  <div>⏰ Next fertilization: <strong>{formatDate(p.nextFertilizationDue)}</strong></div>
+                )}
               </div>
-              {p.nextFertilizationDue && (
-                <div>
-                  Next fertilization: {formatDate(p.nextFertilizationDue)}
-                </div>
-              )}
-              <div style={{ marginTop: '10px' }}>
+              <div className="plant-actions" onClick={(e) => e.stopPropagation()}>
                 <button
                   onClick={() => handleWaterPlant(p.id, p.name)}
                   disabled={wateringStates[p.id]}
+                  className="btn-water"
                 >
-                  {wateringStates[p.id] ? 'Watering...' : '💧 Water'}
+                  {wateringStates[p.id] ? '⏳ Watering...' : '💧 Water'}
                 </button>
                 <button
                   onClick={() => handleFertilizePlant(p.id, p.name)}
                   disabled={fertilizingStates[p.id]}
-                  style={{ marginLeft: '10px' }}
+                  className="btn-fertilizer"
                 >
-                  {fertilizingStates[p.id] ? 'Fertilizing...' : '🌿 Fertilize'}
+                  {fertilizingStates[p.id] ? '⏳ Fertilizing...' : '🌿 Fertilize'}
                 </button>
               </div>
             </div>
@@ -150,8 +161,13 @@ export function HomePage({ navigate }) {
       </div>
       
       {plants.length === 0 && !loading && (
-        <div>
-          No plants yet. Add your first plant to get started! 🌱
+        <div className="empty-state">
+          <div className="empty-state-icon">🌱</div>
+          <h3 className="empty-state-title">No plants yet!</h3>
+          <p className="empty-state-message">Add your first plant to start your garden journey 🌿</p>
+          <button onClick={() => navigate('/new')} className="btn-large">
+            ➕ Add Your First Plant
+          </button>
         </div>
       )}
     </div>

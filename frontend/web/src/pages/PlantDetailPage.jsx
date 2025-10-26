@@ -115,168 +115,214 @@ export function PlantDetailPage({ id, navigate }) {
 
   return (
     <div>
-      <div>
-        <Link to={'/'} navigate={navigate}>← Back to Plants</Link>
+      <div style={{ marginBottom: 'var(--spacing-lg)' }}>
+        <Link to={'/'} navigate={navigate} style={{ fontSize: '1rem', display: 'inline-flex', alignItems: 'center', gap: 'var(--spacing-xs)' }}>
+          ← Back to My Plants
+        </Link>
       </div>
 
-      {loading && <Loading />}
+      {loading && (
+        <div className="loading">
+          <div className="spinner"></div>
+          Loading plant details...
+        </div>
+      )}
+      
       <ErrorMessage error={error} />
       
       {waterSuccess && (
-        <div>
-          Plant watered successfully! 💧
+        <div className="message message-success">
+          <span>💧</span>
+          Plant watered successfully!
         </div>
       )}
       
       {fertilizeSuccess && (
-        <div>
-          Plant fertilized successfully! 🌿
+        <div className="message message-success">
+          <span>🌿</span>
+          Plant fertilized successfully!
         </div>
       )}
 
       {uploadSuccess && (
-        <div>
-          Picture uploaded successfully! 📸
+        <div className="message message-success">
+          <span>📸</span>
+          Picture uploaded successfully!
         </div>
       )}
 
-      {!loading && !plant && !error && <div>Not found.</div>}
+      {!loading && !plant && !error && (
+        <div className="empty-state">
+          <div className="empty-state-icon">🔍</div>
+          <h2 className="empty-state-title">Plant Not Found</h2>
+          <p className="empty-state-message">This plant doesn't exist in your garden.</p>
+          <button onClick={() => navigate('/')}>🏡 Go Home</button>
+        </div>
+      )}
       
       {plant && (
         <div>
-          <h2>{plant.name}</h2>
-          
-          {/* Latest Picture Display */}
-          {plant.latestPictureUrl && (
-            <div style={{ marginBottom: '20px' }}>
-              <img 
-                src={plant.latestPictureUrl} 
-                alt={`Latest picture of ${plant.name}`}
-                style={{ maxWidth: '400px', maxHeight: '400px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #ddd' }}
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
+          <div className="plant-detail-header">
+            {plant.latestPictureUrl && (
+              <div className="plant-detail-image">
+                <img 
+                  src={plant.latestPictureUrl} 
+                  alt={`Latest picture of ${plant.name}`}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+            )}
+            
+            <div className="plant-detail-info">
+              <h2 className="plant-detail-title">🪴 {plant.name}</h2>
+              
+              <div className="plant-detail-meta">
+                {plant.species && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">🌺 Species:</span>
+                    <span className="plant-detail-value">{plant.species}</span>
+                  </div>
+                )}
+                {plant.description && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">📝 Description:</span>
+                    <span className="plant-detail-value">{plant.description}</span>
+                  </div>
+                )}
+                <div className="plant-detail-item">
+                  <span className="plant-detail-label">📅 Date Added:</span>
+                  <span className="plant-detail-value">{formatDate(plant.dateAdded)}</span>
+                </div>
+                <div className="plant-detail-item">
+                  <span className="plant-detail-label">💧 Last Watered:</span>
+                  <span className="plant-detail-value">{plant.lastWatered ? formatDate(plant.lastWatered) : 'Never'}</span>
+                </div>
+                {plant.wateringIntervalDays && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">⏰ Watering Interval:</span>
+                    <span className="plant-detail-value">Every {plant.wateringIntervalDays} days</span>
+                  </div>
+                )}
+                {plant.nextWateringDue && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">🔔 Next Watering:</span>
+                    <span className="plant-detail-value">{formatDate(plant.nextWateringDue)}</span>
+                  </div>
+                )}
+                <div className="plant-detail-item">
+                  <span className="plant-detail-label">🌿 Last Fertilized:</span>
+                  <span className="plant-detail-value">{plant.lastFertilized ? formatDate(plant.lastFertilized) : 'Never'}</span>
+                </div>
+                {plant.fertilizationIntervalDays && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">⏰ Fertilization Interval:</span>
+                    <span className="plant-detail-value">Every {plant.fertilizationIntervalDays} days</span>
+                  </div>
+                )}
+                {plant.nextFertilizationDue && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">🔔 Next Fertilization:</span>
+                    <span className="plant-detail-value">{formatDate(plant.nextFertilizationDue)}</span>
+                  </div>
+                )}
+                {plant.location && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">📍 Location:</span>
+                    <span className="plant-detail-value">{plant.location}</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="plant-actions">
+                <button
+                  onClick={handleWaterPlant}
+                  disabled={watering}
+                  className="btn-water btn-large"
+                >
+                  {watering ? '⏳ Watering...' : '💧 Water Plant'}
+                </button>
+                <button
+                  onClick={handleFertilizePlant}
+                  disabled={fertilizing}
+                  className="btn-fertilizer btn-large"
+                >
+                  {fertilizing ? '⏳ Fertilizing...' : '🌿 Fertilize Plant'}
+                </button>
+                <label style={{ display: 'inline-block' }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePictureUpload}
+                    disabled={uploading}
+                    style={{ display: 'none' }}
+                    id="picture-upload"
+                  />
+                  <button
+                    onClick={() => document.getElementById('picture-upload').click()}
+                    disabled={uploading}
+                    className="btn-picture btn-large"
+                    type="button"
+                  >
+                    {uploading ? '⏳ Uploading...' : '📸 Add Picture'}
+                  </button>
+                </label>
+              </div>
             </div>
-          )}
-          
-          {plant.species && (
-            <div>
-              <strong>Species:</strong> {plant.species}
-            </div>
-          )}
-          {plant.description && (
-            <div>
-              <strong>Description:</strong> {plant.description}
-            </div>
-          )}
-          <div>
-            <strong>Date Added:</strong> {formatDate(plant.dateAdded)}
-          </div>
-          <div>
-            <strong>Last Watered:</strong> {plant.lastWatered ? formatDate(plant.lastWatered) : 'Never'}
-          </div>
-          {plant.wateringIntervalDays && (
-            <div>
-              <strong>Watering Interval (days):</strong> {plant.wateringIntervalDays}
-            </div>
-          )}
-          {plant.location && (
-            <div>
-              <strong>Location:</strong> {plant.location}
-            </div>
-          )}
-          {plant.imageUrl && (
-            <div>
-              <strong>Image:</strong> {plant.imageUrl}
-            </div>
-          )}
-          {plant.nextWateringDue && (
-            <div>
-              <strong>Next Watering Due:</strong> {formatDate(plant.nextWateringDue)}
-            </div>
-          )}
-          <div>
-            <strong>Last Fertilized:</strong> {plant.lastFertilized ? formatDate(plant.lastFertilized) : 'Never'}
-          </div>
-          {plant.fertilizationIntervalDays && (
-            <div>
-              <strong>Fertilization Interval (days):</strong> {plant.fertilizationIntervalDays}
-            </div>
-          )}
-          {plant.nextFertilizationDue && (
-            <div>
-              <strong>Next Fertilization Due:</strong> {formatDate(plant.nextFertilizationDue)}
-            </div>
-          )}
-          
-          <div>
-            <button
-              onClick={handleWaterPlant}
-              disabled={watering}
-            >
-              {watering ? 'Watering...' : '💧 Water Plant'}
-            </button>
-            <button
-              onClick={handleFertilizePlant}
-              disabled={fertilizing}
-              style={{ marginLeft: '10px' }}
-            >
-              {fertilizing ? 'Fertilizing...' : '🌿 Fertilize Plant'}
-            </button>
-            <label style={{ marginLeft: '10px', display: 'inline-block' }}>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handlePictureUpload}
-                disabled={uploading}
-                style={{ display: 'none' }}
-                id="picture-upload"
-              />
-              <button
-                onClick={() => document.getElementById('picture-upload').click()}
-                disabled={uploading}
-                style={{ cursor: 'pointer' }}
-              >
-                {uploading ? 'Uploading...' : '📸 Add Picture'}
-              </button>
-            </label>
           </div>
 
           {/* Care History */}
-          <div style={{ marginTop: '30px' }}>
-            <h3>Care History</h3>
-            {loadingHistory && <p>Loading history...</p>}
+          <div className="care-history">
+            <h3 className="care-history-title">
+              <span>📋</span>
+              Care History
+            </h3>
+            {loadingHistory && (
+              <div className="loading">
+                <div className="spinner"></div>
+                Loading history...
+              </div>
+            )}
             {careHistory.length === 0 && !loadingHistory && (
-              <p>No care history yet. Water, fertilize, or add a picture to start tracking!</p>
+              <div className="empty-state">
+                <div className="empty-state-icon">📝</div>
+                <p className="empty-state-message">No care history yet. Water, fertilize, or add a picture to start tracking!</p>
+              </div>
             )}
             {careHistory.length > 0 && (
-              <ul style={{ listStyle: 'none', padding: 0 }}>
+              <div>
                 {careHistory.map(event => (
-                  <li key={event.id} style={{ marginBottom: '15px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
-                    <div>
-                      <strong>
+                  <div 
+                    key={event.id} 
+                    className={`care-event care-event-${event.type.toLowerCase()}`}
+                  >
+                    <div className="care-event-header">
+                      <span>
                         {event.type === 'Watering' && '💧'}
                         {event.type === 'Fertilization' && '🌿'}
                         {event.type === 'Picture' && '📸'}
-                        {' '}{event.type}:
-                      </strong> {formatDate(event.timestamp)}
+                      </span>
+                      <strong>{event.type}</strong>
+                      <span style={{ marginLeft: 'auto', color: 'var(--color-text-light)' }}>
+                        {formatDate(event.timestamp)}
+                      </span>
                     </div>
                     {event.imageUrl && (
-                      <div style={{ marginTop: '10px' }}>
+                      <div className="care-event-image">
                         <img 
                           src={event.imageUrl} 
                           alt="Plant picture"
-                          style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain', borderRadius: '4px' }}
+                          style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain' }}
                         />
                       </div>
                     )}
                     {event.notes && (
-                      <div style={{ marginTop: '5px', fontStyle: 'italic' }}>
-                        Note: {event.notes}
+                      <div className="care-event-notes">
+                        💬 {event.notes}
                       </div>
                     )}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
         </div>
