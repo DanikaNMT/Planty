@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getPlants, waterPlant, fertilizePlant } from '../api/plants.js';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
+import { TodoSection } from '../components/TodoSection.jsx';
 import { formatDate } from '../utils/formatDate.js';
 
 export function HomePage({ navigate }) {
@@ -69,6 +70,9 @@ export function HomePage({ navigate }) {
 
   return (
     <div>
+      {/* Todo Section - shows upcoming tasks for next 24 hours */}
+      <TodoSection navigate={navigate} onActionComplete={load} />
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-xl)' }}>
         <h2 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
           <span>🪴</span>

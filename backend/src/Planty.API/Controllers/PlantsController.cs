@@ -9,6 +9,7 @@ using Planty.Application.Queries.GetPlants;
 using Planty.Application.Queries.GetPlantWaterings;
 using Planty.Application.Queries.GetPlantFertilizations;
 using Planty.Application.Queries.GetPlantCareHistory;
+using Planty.Application.Queries.GetPlantTodos;
 using Planty.Application.Commands.WaterPlant;
 using Planty.Application.Commands.UploadPlantPicture;
 using Planty.Contracts.Plants;
@@ -34,6 +35,18 @@ public class PlantsController : ControllerBase
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (userId == null) return Unauthorized();
         var query = new GetPlantsQuery(Guid.Parse(userId));
+        var result = await _mediator.Send(query, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("todos")]
+    public async Task<ActionResult<IEnumerable<PlantTodoResponse>>> GetPlantTodos(
+        [FromQuery] int hoursAhead = 24, 
+        CancellationToken cancellationToken = default)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        var query = new GetPlantTodosQuery(Guid.Parse(userId), hoursAhead);
         var result = await _mediator.Send(query, cancellationToken);
         return Ok(result);
     }

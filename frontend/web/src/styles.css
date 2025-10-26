@@ -622,3 +622,127 @@ a:hover {
 
 .text-center { text-align: center; }
 .text-muted { color: var(--color-text-light); }
+
+/* Todo Section */
+.todo-section {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.todo-card {
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-md);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.todo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.todo-card.todo-overdue {
+  border-color: var(--color-error);
+  background: #fff5f5;
+}
+
+.todo-card-image {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.todo-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.todo-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.todo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.todo-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.todo-card-species {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.todo-card-due {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.todo-card-due.overdue {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.todo-card-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .todo-card {
+    flex-direction: column;
+  }
+  
+  .todo-card-image {
+    width: 100%;
+    height: 150px;
+  }
+  
+  .todo-card-header {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+  
+  .todo-card-due {
+    align-self: flex-start;
+  }
+  
+  .todo-card-actions button {
+    flex: 1;
+  }
+}

@@ -3,6 +3,7 @@ import { useRouter } from './router.js';
 import { HomePage } from './pages/HomePage.jsx';
 import { PlantDetailPage } from './pages/PlantDetailPage.jsx';
 import { NewPlantPage } from './pages/NewPlantPage.jsx';
+import { TodosPage } from './pages/TodosPage.jsx';
 import { AuthPage } from './pages/AuthPage.jsx';
 
 export default function App() {
@@ -34,6 +35,8 @@ export default function App() {
       page = <PlantDetailPage id={route.id} navigate={navigate} />; break;
     case 'new':
       page = <NewPlantPage navigate={navigate} />; break;
+    case 'todos':
+      page = <TodosPage navigate={navigate} />; break;
     default:
       page = (
         <div className="empty-state">

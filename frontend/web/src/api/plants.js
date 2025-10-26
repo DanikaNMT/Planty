@@ -4,6 +4,10 @@ export function getPlants() {
   return apiFetch('/api/plants');
 }
 
+export function getPlantTodos(hoursAhead = 24) {
+  return apiFetch(`/api/plants/todos?hoursAhead=${hoursAhead}`);
+}
+
 export function getPlant(id) {
   return apiFetch(`/api/plants/${id}`);
 }

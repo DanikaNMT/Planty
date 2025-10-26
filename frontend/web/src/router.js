@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 export function parsePath(pathname) {
   if (pathname === '/') return { name: 'home' };
   if (pathname === '/new') return { name: 'new' };
+  if (pathname === '/todos') return { name: 'todos' };
   const plantMatch = pathname.match(/^\/plant\/(.+)$/);
   if (plantMatch) return { name: 'plant', id: plantMatch[1] };
   return { name: 'not-found' };
