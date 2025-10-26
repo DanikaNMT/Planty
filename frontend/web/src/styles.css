@@ -398,6 +398,15 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Care schedule section */
+.care-schedule-section {
+  margin-top: var(--spacing-xl);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+}
+
 /* Care history */
 .care-history {
   margin-top: var(--spacing-xl);

@@ -3,18 +3,21 @@ namespace Planty.Application.Tests.Commands;
 using FluentAssertions;
 using Moq;
 using Planty.Application.Commands.CreatePlant;
+using Planty.Application.Interfaces;
 using Planty.Domain.Entities;
 using Planty.Domain.Repositories;
 
 public class CreatePlantCommandHandlerTests
 {
-    private readonly Mock<IPlantRepository> _mockRepository;
+    private readonly Mock<IPlantRepository> _mockPlantRepository;
+    private readonly Mock<ISpeciesRepository> _mockSpeciesRepository;
     private readonly CreatePlantCommandHandler _handler;
 
     public CreatePlantCommandHandlerTests()
     {
-        _mockRepository = new Mock<IPlantRepository>();
-        _handler = new CreatePlantCommandHandler(_mockRepository.Object);
+        _mockPlantRepository = new Mock<IPlantRepository>();
+        _mockSpeciesRepository = new Mock<ISpeciesRepository>();
+        _handler = new CreatePlantCommandHandler(_mockPlantRepository.Object, _mockSpeciesRepository.Object);
     }
 
     [Fact]
@@ -22,30 +25,46 @@ public class CreatePlantCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
+        var speciesId = Guid.NewGuid();
         var command = new CreatePlantCommand(
             "Test Plant",
-            "Test Species",
+            speciesId,
             "Test Description",
-            7,
-            null, // FertilizationIntervalDays
             null, // LocationId
             userId
         );
+
+        var species = new Species
+        {
+            Id = speciesId,
+            Name = "Test Species",
+            UserId = userId,
+            WateringIntervalDays = 7,
+            FertilizationIntervalDays = 30
+        };
 
         var plant = new Plant
         {
             Id = Guid.NewGuid(),
             Name = command.Name,
-            Species = command.Species,
+            SpeciesId = command.SpeciesId,
+            Species = species,
             Description = command.Description,
-            WateringIntervalDays = command.WateringIntervalDays,
             LocationId = command.LocationId,
             DateAdded = DateTime.UtcNow,
             UserId = userId
         };
 
-        _mockRepository
+        _mockSpeciesRepository
+            .Setup(r => r.GetByIdAsync(speciesId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(species);
+
+        _mockPlantRepository
             .Setup(r => r.AddAsync(It.IsAny<Plant>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(plant);
+
+        _mockPlantRepository
+            .Setup(r => r.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(plant);
 
         // Act
@@ -54,12 +73,12 @@ public class CreatePlantCommandHandlerTests
         // Assert
         result.Should().NotBeNull();
         result.Name.Should().Be(command.Name);
-        result.Species.Should().Be(command.Species);
+        result.SpeciesId.Should().Be(speciesId);
+        result.SpeciesName.Should().Be("Test Species");
         result.Description.Should().Be(command.Description);
-        result.WateringIntervalDays.Should().Be(command.WateringIntervalDays);
         result.Location.Should().BeNull(); // Since LocationId is null, Location name should be null
 
-        _mockRepository.Verify(r => r.AddAsync(It.IsAny<Plant>(), It.IsAny<CancellationToken>()), Times.Once);
-        _mockRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockPlantRepository.Verify(r => r.AddAsync(It.IsAny<Plant>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPlantRepository.Verify(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
     }
 }

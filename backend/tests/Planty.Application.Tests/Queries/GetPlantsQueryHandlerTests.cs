@@ -22,10 +22,13 @@ public class GetPlantsQueryHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
+        var species1 = new Species { Id = Guid.NewGuid(), Name = "Species 1", WateringIntervalDays = 7, UserId = userId };
+        var species2 = new Species { Id = Guid.NewGuid(), Name = "Species 2", WateringIntervalDays = 5, UserId = userId };
+        
         var plants = new List<Plant>
         {
-            new() { Id = Guid.NewGuid(), Name = "Plant 1", Species = "Species 1", WateringIntervalDays = 7, UserId = userId },
-            new() { Id = Guid.NewGuid(), Name = "Plant 2", Species = "Species 2", WateringIntervalDays = 5, UserId = userId }
+            new() { Id = Guid.NewGuid(), Name = "Plant 1", Species = species1, SpeciesId = species1.Id, UserId = userId },
+            new() { Id = Guid.NewGuid(), Name = "Plant 2", Species = species2, SpeciesId = species2.Id, UserId = userId }
         };
 
         _mockRepository

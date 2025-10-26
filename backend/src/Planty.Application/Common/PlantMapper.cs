@@ -14,22 +14,28 @@ public static class PlantMapper
         var lastFertilized = plant.Fertilizations.OrderByDescending(f => f.FertilizedAt).FirstOrDefault()?.FertilizedAt;
         var latestPicture = plant.Pictures.OrderByDescending(p => p.TakenAt).FirstOrDefault();
         
-        DateTime? nextWateringDue = CalculateNextDue(lastWatered, plant.DateAdded, plant.WateringIntervalDays);
-        DateTime? nextFertilizationDue = CalculateNextDue(lastFertilized, plant.DateAdded, plant.FertilizationIntervalDays);
+        // Get intervals from species if available
+        var wateringInterval = plant.Species?.WateringIntervalDays;
+        var fertilizationInterval = plant.Species?.FertilizationIntervalDays;
+        
+        DateTime? nextWateringDue = CalculateNextDue(lastWatered, plant.DateAdded, wateringInterval);
+        DateTime? nextFertilizationDue = CalculateNextDue(lastFertilized, plant.DateAdded, fertilizationInterval);
 
         return new PlantResponse(
             plant.Id,
             plant.Name,
-            plant.Species,
+            plant.SpeciesId,
+            plant.Species?.Name,
             plant.Description,
             plant.DateAdded,
             lastWatered,
-            plant.WateringIntervalDays,
+            wateringInterval,
+            plant.LocationId,
             plant.Location?.Name,
             plant.ImageUrl,
             nextWateringDue,
             lastFertilized,
-            plant.FertilizationIntervalDays,
+            fertilizationInterval,
             nextFertilizationDue,
             latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null
         );

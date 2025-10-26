@@ -97,12 +97,20 @@ public class WaterPlantCommandHandlerTests
     {
         // Arrange
         var plantId = Guid.NewGuid();
+        var species = new Species
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test Species",
+            WateringIntervalDays = 7,
+            UserId = _userId
+        };
+
         var plant = new Plant
         {
             Id = plantId,
             Name = "Test Plant",
-            Species = "Test Species",
-            WateringIntervalDays = 7,
+            SpeciesId = species.Id,
+            Species = species,
             UserId = _userId
         };
         

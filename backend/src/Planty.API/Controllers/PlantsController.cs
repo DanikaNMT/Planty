@@ -70,10 +70,8 @@ public class PlantsController : ControllerBase
         if (userId == null) return Unauthorized();
         var command = new CreatePlantCommand(
             request.Name,
-            request.Species,
+            request.SpeciesId,
             request.Description,
-            request.WateringIntervalDays,
-            request.FertilizationIntervalDays,
             request.LocationId,
             Guid.Parse(userId)
         );
@@ -92,10 +90,8 @@ public class PlantsController : ControllerBase
                 id,
                 Guid.Parse(userId),
                 request.Name,
-                request.Species,
+                request.SpeciesId,
                 request.Description,
-                request.WateringIntervalDays,
-                request.FertilizationIntervalDays,
                 request.LocationId
             );
             var result = await _mediator.Send(command, cancellationToken);

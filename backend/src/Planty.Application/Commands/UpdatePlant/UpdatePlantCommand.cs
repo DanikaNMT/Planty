@@ -7,9 +7,7 @@ public record UpdatePlantCommand(
     Guid PlantId,
     Guid UserId,
     string Name,
-    string? Species,
+    Guid? SpeciesId,
     string? Description,
-    int? WateringIntervalDays,
-    int? FertilizationIntervalDays,
     Guid? LocationId
 ) : IRequest<PlantResponse>;

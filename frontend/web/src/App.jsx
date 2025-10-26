@@ -5,6 +5,9 @@ import { PlantDetailPage } from './pages/PlantDetailPage.jsx';
 import { NewPlantPage } from './pages/NewPlantPage.jsx';
 import { TodosPage } from './pages/TodosPage.jsx';
 import { AuthPage } from './pages/AuthPage.jsx';
+import { SpeciesPage } from './pages/SpeciesPage.jsx';
+import { NewSpeciesPage } from './pages/NewSpeciesPage.jsx';
+import { SpeciesDetailPage } from './pages/SpeciesDetailPage.jsx';
 
 export default function App() {
   const { route, navigate } = useRouter();
@@ -37,6 +40,12 @@ export default function App() {
       page = <NewPlantPage navigate={navigate} />; break;
     case 'todos':
       page = <TodosPage navigate={navigate} />; break;
+    case 'species':
+      page = <SpeciesPage navigate={navigate} />; break;
+    case 'species-new':
+      page = <NewSpeciesPage navigate={navigate} />; break;
+    case 'species-detail':
+      page = <SpeciesDetailPage id={route.id} navigate={navigate} />; break;
     default:
       page = (
         <div className="empty-state">
@@ -55,9 +64,20 @@ export default function App() {
           <span>🌱</span>
           Planty
         </h1>
-        <button onClick={handleLogout} className="btn-outline btn-small">
-          👋 Logout
-        </button>
+        <div style={{ display: 'flex', gap: 'var(--spacing-sm)', alignItems: 'center' }}>
+          <button onClick={() => navigate('/')} className="btn-outline btn-small">
+            🏡 Home
+          </button>
+          <button onClick={() => navigate('/species')} className="btn-outline btn-small">
+            🌺 Species
+          </button>
+          <button onClick={() => navigate('/todos')} className="btn-outline btn-small">
+            ✅ Todos
+          </button>
+          <button onClick={handleLogout} className="btn-outline btn-small">
+            👋 Logout
+          </button>
+        </div>
       </header>
       {page}
     </div>

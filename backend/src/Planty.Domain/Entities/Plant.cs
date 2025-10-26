@@ -4,16 +4,17 @@ public class Plant
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
-    public string? Species { get; set; }
     public string? Description { get; set; }
     public DateTime DateAdded { get; set; } = DateTime.UtcNow;
-    public int? WateringIntervalDays { get; set; }
-    public int? FertilizationIntervalDays { get; set; }
     public string? ImageUrl { get; set; }
 
     // User relationship
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
+
+    // Species relationship - determines care intervals
+    public Guid? SpeciesId { get; set; }
+    public Species? Species { get; set; }
 
     // Location relationship
     public Guid? LocationId { get; set; }

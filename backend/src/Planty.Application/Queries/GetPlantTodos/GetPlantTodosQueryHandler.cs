@@ -21,13 +21,17 @@ public class GetPlantTodosQueryHandler : IRequestHandler<GetPlantTodosQuery, IEn
 
         foreach (var plant in plants)
         {
+            // Skip plants without species (no care intervals defined)
+            if (plant.Species == null)
+                continue;
+
             // Check for watering todos
-            if (plant.WateringIntervalDays.HasValue)
+            if (plant.Species.WateringIntervalDays.HasValue)
             {
                 var lastWatered = plant.Waterings.OrderByDescending(w => w.WateredAt).FirstOrDefault()?.WateredAt;
                 var nextWateringDue = lastWatered.HasValue 
-                    ? lastWatered.Value.AddDays(plant.WateringIntervalDays.Value)
-                    : plant.DateAdded.AddDays(plant.WateringIntervalDays.Value);
+                    ? lastWatered.Value.AddDays(plant.Species.WateringIntervalDays.Value)
+                    : plant.DateAdded.AddDays(plant.Species.WateringIntervalDays.Value);
 
                 if (nextWateringDue <= cutoffDate)
                 {
@@ -35,7 +39,7 @@ public class GetPlantTodosQueryHandler : IRequestHandler<GetPlantTodosQuery, IEn
                     todos.Add(new PlantTodoResponse(
                         plant.Id,
                         plant.Name,
-                        plant.Species,
+                        plant.Species.Name,
                         "Water",
                         nextWateringDue,
                         latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null
@@ -44,12 +48,12 @@ public class GetPlantTodosQueryHandler : IRequestHandler<GetPlantTodosQuery, IEn
             }
 
             // Check for fertilization todos
-            if (plant.FertilizationIntervalDays.HasValue)
+            if (plant.Species.FertilizationIntervalDays.HasValue)
             {
                 var lastFertilized = plant.Fertilizations.OrderByDescending(f => f.FertilizedAt).FirstOrDefault()?.FertilizedAt;
                 var nextFertilizationDue = lastFertilized.HasValue
-                    ? lastFertilized.Value.AddDays(plant.FertilizationIntervalDays.Value)
-                    : plant.DateAdded.AddDays(plant.FertilizationIntervalDays.Value);
+                    ? lastFertilized.Value.AddDays(plant.Species.FertilizationIntervalDays.Value)
+                    : plant.DateAdded.AddDays(plant.Species.FertilizationIntervalDays.Value);
 
                 if (nextFertilizationDue <= cutoffDate)
                 {
@@ -57,7 +61,7 @@ public class GetPlantTodosQueryHandler : IRequestHandler<GetPlantTodosQuery, IEn
                     todos.Add(new PlantTodoResponse(
                         plant.Id,
                         plant.Name,
-                        plant.Species,
+                        plant.Species.Name,
                         "Fertilize",
                         nextFertilizationDue,
                         latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null

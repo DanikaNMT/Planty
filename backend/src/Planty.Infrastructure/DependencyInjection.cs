@@ -3,6 +3,7 @@ namespace Planty.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Planty.Application.Interfaces;
 using Planty.Application.Services;
 using Planty.Domain.Repositories;
 using Planty.Infrastructure.Data;
@@ -20,6 +21,7 @@ public static class DependencyInjection
 
         services.AddScoped<IPlantRepository, PlantRepository>();
         services.AddScoped<ILocationRepository, LocationRepository>();
+        services.AddScoped<ISpeciesRepository, SpeciesRepository>();
         services.AddScoped<IWateringRepository, WateringRepository>();
         services.AddScoped<IFertilizationRepository, FertilizationRepository>();
         services.AddScoped<IPlantPictureRepository, PlantPictureRepository>();

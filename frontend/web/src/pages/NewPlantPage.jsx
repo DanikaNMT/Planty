@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
-import { createPlant } from '../api/plants.js';
+import React, { useEffect, useState } from 'react';
+import { createPlant, getLocations } from '../api/plants.js';
+import { getSpecies } from '../api/species.js';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
-import { Loading } from '../components/Loading.jsx';
 
 export function NewPlantPage({ navigate }) {
-  const [data, setData] = useState({ name: '', species: '', description: '', wateringIntervalDays: 7, fertilizationIntervalDays: '', location: '' });
+  const [data, setData] = useState({ name: '', speciesId: '', description: '', locationId: '' });
+  const [species, setSpecies] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Load species and locations
+    getSpecies().then(setSpecies).catch(console.error);
+    getLocations().then(setLocations).catch(console.error);
+  }, []);
 
   function submit(e) {
     e.preventDefault();
@@ -39,19 +47,30 @@ export function NewPlantPage({ navigate }) {
               type="text"
               value={data.name} 
               onChange={e => setData({ ...data, name: e.target.value })} 
-              placeholder="e.g., Monstera, Basil, Tomato"
+              placeholder="e.g., My Monstera, Basil, Tomato"
               required 
             />
           </div>
           
           <div className="form-group">
             <label>🌺 Species</label>
-            <input 
-              type="text"
-              value={data.species} 
-              onChange={e => setData({ ...data, species: e.target.value })} 
-              placeholder="e.g., Monstera deliciosa"
-            />
+            <select 
+              value={data.speciesId} 
+              onChange={e => setData({ ...data, speciesId: e.target.value })}
+            >
+              <option value="">No species (no care schedule)</option>
+              {species.map(s => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                  {(s.wateringIntervalDays || s.fertilizationIntervalDays) && 
+                    ` (💧 ${s.wateringIntervalDays || '—'} days, 🌿 ${s.fertilizationIntervalDays || '—'} days)`
+                  }
+                </option>
+              ))}
+            </select>
+            <small style={{ color: 'var(--color-text-light)', display: 'block', marginTop: 'var(--spacing-xs)' }}>
+              Species defines watering and fertilization schedule. <a onClick={() => navigate('/species/new')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Create new species</a>
+            </small>
           </div>
           
           <div className="form-group">
@@ -64,41 +83,18 @@ export function NewPlantPage({ navigate }) {
           </div>
           
           <div className="form-group">
-            <label>💧 Watering Interval (days)</label>
-            <input 
-              type="number" 
-              value={data.wateringIntervalDays} 
-              onChange={e => setData({ ...data, wateringIntervalDays: e.target.value })} 
-              min="1"
-              placeholder="7"
-            />
-            <small style={{ color: 'var(--color-text-light)', display: 'block', marginTop: 'var(--spacing-xs)' }}>
-              How often does this plant need water?
-            </small>
-          </div>
-          
-          <div className="form-group">
-            <label>🌿 Fertilization Interval (days)</label>
-            <input 
-              type="number" 
-              value={data.fertilizationIntervalDays} 
-              onChange={e => setData({ ...data, fertilizationIntervalDays: e.target.value })} 
-              min="1"
-              placeholder="30"
-            />
-            <small style={{ color: 'var(--color-text-light)', display: 'block', marginTop: 'var(--spacing-xs)' }}>
-              How often should you fertilize?
-            </small>
-          </div>
-          
-          <div className="form-group">
             <label>📍 Location</label>
-            <input 
-              type="text"
-              value={data.location} 
-              onChange={e => setData({ ...data, location: e.target.value })} 
-              placeholder="e.g., Living room, Balcony, Kitchen"
-            />
+            <select 
+              value={data.locationId} 
+              onChange={e => setData({ ...data, locationId: e.target.value })}
+            >
+              <option value="">No location</option>
+              {locations.map(l => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                </option>
+              ))}
+            </select>
           </div>
           
           <button type="submit" disabled={creating} className="btn-large" style={{ width: '100%' }}>

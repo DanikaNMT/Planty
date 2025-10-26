@@ -34,16 +34,26 @@ public class WateringRepositoryTests : IDisposable
             PasswordHash = "hashedpassword"
         };
 
+        var species = new Species
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test Species",
+            UserId = _userId,
+            User = user
+        };
+
         var plant = new Plant
         {
             Id = _plantId,
             Name = "Test Plant",
-            Species = "Test Species",
+            SpeciesId = species.Id,
+            Species = species,
             UserId = _userId,
             User = user
         };
 
         _context.Users.Add(user);
+        _context.Species.Add(species);
         _context.Plants.Add(plant);
         _context.SaveChanges();
     }

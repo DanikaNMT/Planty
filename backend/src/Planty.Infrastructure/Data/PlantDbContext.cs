@@ -11,6 +11,7 @@ public class PlantDbContext : DbContext
     public DbSet<Plant> Plants { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Location> Locations { get; set; } = null!;
+    public DbSet<Species> Species { get; set; } = null!;
     public DbSet<Watering> Waterings { get; set; } = null!;
     public DbSet<Fertilization> Fertilizations { get; set; } = null!;
     public DbSet<PlantPicture> PlantPictures { get; set; } = null!;
@@ -23,17 +24,19 @@ public class PlantDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Species).HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.ImageUrl).HasMaxLength(500);
             entity.Property(e => e.DateAdded).IsRequired();
-            entity.Property(e => e.WateringIntervalDays);
-            entity.Property(e => e.FertilizationIntervalDays);
 
             entity.HasOne(e => e.User)
                   .WithMany(u => u.Plants)
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Species)
+                  .WithMany(s => s.Plants)
+                  .HasForeignKey(e => e.SpeciesId)
+                  .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne(e => e.Location)
                   .WithMany(l => l.Plants)
@@ -98,6 +101,20 @@ public class PlantDbContext : DbContext
 
             entity.HasOne(e => e.User)
                   .WithMany(u => u.Locations)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Species>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.WateringIntervalDays);
+            entity.Property(e => e.FertilizationIntervalDays);
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.Species)
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });

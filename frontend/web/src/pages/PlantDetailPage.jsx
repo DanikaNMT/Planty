@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getPlant, waterPlant, fertilizePlant, getPlantCareHistory, uploadPlantPicture, updatePlant } from '../api/plants.js';
+import { getPlant, waterPlant, fertilizePlant, getPlantCareHistory, uploadPlantPicture, updatePlant, getLocations } from '../api/plants.js';
+import { getSpecies } from '../api/species.js';
 import { Loading } from '../components/Loading.jsx';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
 import { formatDate } from '../utils/formatDate.js';
@@ -8,6 +9,8 @@ import Link from '../components/Link.jsx';
 export function PlantDetailPage({ id, navigate }) {
   const [plant, setPlant] = useState(null);
   const [careHistory, setCareHistory] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [species, setSpecies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [error, setError] = useState(null);
@@ -21,25 +24,31 @@ export function PlantDetailPage({ id, navigate }) {
   const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({
     name: '',
-    species: '',
+    speciesId: '',
     description: '',
-    wateringIntervalDays: '',
-    fertilizationIntervalDays: ''
+    locationId: ''
   });
 
   useEffect(() => {
     setLoading(true);
     setError(null);
-    getPlant(id)
-      .then(plant => {
+    
+    // Load plant, locations, and species in parallel
+    Promise.all([
+      getPlant(id),
+      getLocations(),
+      getSpecies()
+    ])
+      .then(([plant, locations, species]) => {
         setPlant(plant);
+        setLocations(locations);
+        setSpecies(species);
         // Initialize edit form with plant data
         setEditForm({
           name: plant.name || '',
-          species: plant.species || '',
+          speciesId: plant.speciesId || '',
           description: plant.description || '',
-          wateringIntervalDays: plant.wateringIntervalDays || '',
-          fertilizationIntervalDays: plant.fertilizationIntervalDays || ''
+          locationId: plant.locationId || ''
         });
       })
       .catch(e => setError(e.message))
@@ -146,7 +155,8 @@ export function PlantDetailPage({ id, navigate }) {
       species: plant.species || '',
       description: plant.description || '',
       wateringIntervalDays: plant.wateringIntervalDays || '',
-      fertilizationIntervalDays: plant.fertilizationIntervalDays || ''
+      fertilizationIntervalDays: plant.fertilizationIntervalDays || '',
+      locationId: plant.locationId || ''
     });
   };
 
@@ -166,7 +176,8 @@ export function PlantDetailPage({ id, navigate }) {
         species: updatedPlant.species || '',
         description: updatedPlant.description || '',
         wateringIntervalDays: updatedPlant.wateringIntervalDays || '',
-        fertilizationIntervalDays: updatedPlant.fertilizationIntervalDays || ''
+        fertilizationIntervalDays: updatedPlant.fertilizationIntervalDays || '',
+        locationId: updatedPlant.locationId || ''
       });
     } catch (e) {
       setError(e.message);
@@ -313,14 +324,11 @@ export function PlantDetailPage({ id, navigate }) {
                   </div>
                   <div>
                     <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
-                      Watering Interval (days)
+                      Species
                     </label>
-                    <input
-                      type="number"
-                      value={editForm.wateringIntervalDays}
-                      onChange={(e) => handleFormChange('wateringIntervalDays', e.target.value)}
-                      placeholder="e.g., 7"
-                      min="1"
+                    <select
+                      value={editForm.speciesId}
+                      onChange={(e) => handleFormChange('speciesId', e.target.value)}
                       style={{
                         width: '100%',
                         padding: 'var(--spacing-sm) var(--spacing-md)',
@@ -328,18 +336,25 @@ export function PlantDetailPage({ id, navigate }) {
                         borderRadius: 'var(--radius-md)',
                         fontSize: '1rem',
                       }}
-                    />
+                    >
+                      <option value="">No species (no care schedule)</option>
+                      {species.map(s => (
+                        <option key={s.id} value={s.id}>
+                          {s.name}
+                          {(s.wateringIntervalDays || s.fertilizationIntervalDays) && 
+                            ` (💧 ${s.wateringIntervalDays || '—'} days, 🌿 ${s.fertilizationIntervalDays || '—'} days)`
+                          }
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
-                      Fertilization Interval (days)
+                      Location
                     </label>
-                    <input
-                      type="number"
-                      value={editForm.fertilizationIntervalDays}
-                      onChange={(e) => handleFormChange('fertilizationIntervalDays', e.target.value)}
-                      placeholder="e.g., 30"
-                      min="1"
+                    <select
+                      value={editForm.locationId}
+                      onChange={(e) => handleFormChange('locationId', e.target.value)}
                       style={{
                         width: '100%',
                         padding: 'var(--spacing-sm) var(--spacing-md)',
@@ -347,7 +362,14 @@ export function PlantDetailPage({ id, navigate }) {
                         borderRadius: 'var(--radius-md)',
                         fontSize: '1rem',
                       }}
-                    />
+                    >
+                      <option value="">No location</option>
+                      {locations.map(location => (
+                        <option key={location.id} value={location.id}>
+                          {location.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginTop: 'var(--spacing-md)' }}>
                     <button
@@ -371,10 +393,16 @@ export function PlantDetailPage({ id, navigate }) {
               ) : (
                 <>
                   <div className="plant-detail-meta">
-                    {plant.species && (
+                    {plant.speciesName && (
                       <div className="plant-detail-item">
                         <span className="plant-detail-label">🌺 Species:</span>
-                        <span className="plant-detail-value">{plant.species}</span>
+                        <span 
+                          className="plant-detail-value" 
+                          style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                          onClick={() => navigate(`/species/${plant.speciesId}`)}
+                        >
+                          {plant.speciesName}
+                        </span>
                       </div>
                     )}
                     {plant.description && (
@@ -383,48 +411,16 @@ export function PlantDetailPage({ id, navigate }) {
                         <span className="plant-detail-value">{plant.description}</span>
                       </div>
                     )}
-                    <div className="plant-detail-item">
-                      <span className="plant-detail-label">📅 Date Added:</span>
-                      <span className="plant-detail-value">{formatDate(plant.dateAdded)}</span>
-                    </div>
-                    <div className="plant-detail-item">
-                      <span className="plant-detail-label">💧 Last Watered:</span>
-                      <span className="plant-detail-value">{plant.lastWatered ? formatDate(plant.lastWatered) : 'Never'}</span>
-                    </div>
-                    {plant.wateringIntervalDays && (
-                      <div className="plant-detail-item">
-                        <span className="plant-detail-label">⏰ Watering Interval:</span>
-                        <span className="plant-detail-value">Every {plant.wateringIntervalDays} days</span>
-                      </div>
-                    )}
-                    {plant.nextWateringDue && (
-                      <div className="plant-detail-item">
-                        <span className="plant-detail-label">🔔 Next Watering:</span>
-                        <span className="plant-detail-value">{formatDate(plant.nextWateringDue)}</span>
-                      </div>
-                    )}
-                    <div className="plant-detail-item">
-                      <span className="plant-detail-label">🌿 Last Fertilized:</span>
-                      <span className="plant-detail-value">{plant.lastFertilized ? formatDate(plant.lastFertilized) : 'Never'}</span>
-                    </div>
-                    {plant.fertilizationIntervalDays && (
-                      <div className="plant-detail-item">
-                        <span className="plant-detail-label">⏰ Fertilization Interval:</span>
-                        <span className="plant-detail-value">Every {plant.fertilizationIntervalDays} days</span>
-                      </div>
-                    )}
-                    {plant.nextFertilizationDue && (
-                      <div className="plant-detail-item">
-                        <span className="plant-detail-label">🔔 Next Fertilization:</span>
-                        <span className="plant-detail-value">{formatDate(plant.nextFertilizationDue)}</span>
-                      </div>
-                    )}
                     {plant.location && (
                       <div className="plant-detail-item">
-                        <span className="plant-detail-label">📍 Location:</span>
+                        <span className="plant-detail-label">� Location:</span>
                         <span className="plant-detail-value">{plant.location}</span>
                       </div>
                     )}
+                    <div className="plant-detail-item">
+                      <span className="plant-detail-label">� Date Added:</span>
+                      <span className="plant-detail-value">{formatDate(plant.dateAdded)}</span>
+                    </div>
                   </div>
                   
                   <div className="plant-actions">
@@ -465,6 +461,57 @@ export function PlantDetailPage({ id, navigate }) {
               )}
             </div>
           </div>
+
+          {/* Care Schedule Section */}
+          {!isEditing && (plant.lastWatered || plant.lastFertilized || plant.wateringIntervalDays || plant.fertilizationIntervalDays) && (
+            <div className="care-schedule-section">
+              <h3 style={{ 
+                fontSize: '1.25rem', 
+                fontWeight: '700', 
+                marginBottom: 'var(--spacing-md)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-sm)'
+              }}>
+                <span>📅</span>
+                Care Schedule
+              </h3>
+              <div className="plant-detail-meta">
+                <div className="plant-detail-item">
+                  <span className="plant-detail-label">� Last Watered:</span>
+                  <span className="plant-detail-value">{plant.lastWatered ? formatDate(plant.lastWatered) : 'Never'}</span>
+                </div>
+                {plant.wateringIntervalDays && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">⏰ Watering Interval:</span>
+                    <span className="plant-detail-value">Every {plant.wateringIntervalDays} days</span>
+                  </div>
+                )}
+                {plant.nextWateringDue && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">🔔 Next Watering:</span>
+                    <span className="plant-detail-value">{formatDate(plant.nextWateringDue)}</span>
+                  </div>
+                )}
+                <div className="plant-detail-item">
+                  <span className="plant-detail-label">🌿 Last Fertilized:</span>
+                  <span className="plant-detail-value">{plant.lastFertilized ? formatDate(plant.lastFertilized) : 'Never'}</span>
+                </div>
+                {plant.fertilizationIntervalDays && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">⏰ Fertilization Interval:</span>
+                    <span className="plant-detail-value">Every {plant.fertilizationIntervalDays} days</span>
+                  </div>
+                )}
+                {plant.nextFertilizationDue && (
+                  <div className="plant-detail-item">
+                    <span className="plant-detail-label">🔔 Next Fertilization:</span>
+                    <span className="plant-detail-value">{formatDate(plant.nextFertilizationDue)}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Care History */}
           <div className="care-history">

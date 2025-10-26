@@ -131,7 +131,7 @@ export function HomePage({ navigate }) {
             )}
             <div className="plant-card-content">
               <div className="plant-card-title">
-                {p.name}{p.species ? ` - ${p.species}` : ''}
+                {p.name}{p.speciesName ? ` - ${p.speciesName}` : ''}
               </div>
               <div className="plant-info">
                 <div>💧 Last watered: <strong>{p.lastWatered ? formatDate(p.lastWatered) : 'Never'}</strong></div>

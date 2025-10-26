@@ -17,11 +17,9 @@ export function createPlant(data) {
     method: 'POST',
     body: JSON.stringify({
       name: data.name,
-      species: data.species || null,
+      speciesId: data.speciesId || null,
       description: data.description || null,
-      wateringIntervalDays: data.wateringIntervalDays ? Number(data.wateringIntervalDays) : null,
-      fertilizationIntervalDays: data.fertilizationIntervalDays ? Number(data.fertilizationIntervalDays) : null,
-      location: data.location || null
+      locationId: data.locationId || null
     })
   });
 }
@@ -31,10 +29,8 @@ export function updatePlant(id, data) {
     method: 'PUT',
     body: JSON.stringify({
       name: data.name,
-      species: data.species || null,
+      speciesId: data.speciesId || null,
       description: data.description || null,
-      wateringIntervalDays: data.wateringIntervalDays ? Number(data.wateringIntervalDays) : null,
-      fertilizationIntervalDays: data.fertilizationIntervalDays ? Number(data.fertilizationIntervalDays) : null,
       locationId: data.locationId || null
     })
   });
@@ -75,4 +71,8 @@ export function uploadPlantPicture(id, file, notes = null) {
     method: 'POST',
     body: formData
   });
+}
+
+export function getLocations() {
+  return apiFetch('/api/locations');
 }

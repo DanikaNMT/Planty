@@ -2,9 +2,7 @@ namespace Planty.Contracts.Plants;
 
 public record CreatePlantRequest(
     string Name,
-    string? Species,
+    Guid? SpeciesId,
     string? Description,
-    int? WateringIntervalDays,
-    int? FertilizationIntervalDays,
     Guid? LocationId
 );

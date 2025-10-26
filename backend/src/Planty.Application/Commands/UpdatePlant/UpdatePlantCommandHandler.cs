@@ -2,6 +2,7 @@ namespace Planty.Application.Commands.UpdatePlant;
 
 using MediatR;
 using Planty.Application.Common;
+using Planty.Application.Interfaces;
 using Planty.Contracts.Plants;
 using Planty.Domain.Repositories;
 
@@ -9,13 +10,16 @@ public class UpdatePlantCommandHandler : IRequestHandler<UpdatePlantCommand, Pla
 {
     private readonly IPlantRepository _plantRepository;
     private readonly ILocationRepository _locationRepository;
+    private readonly ISpeciesRepository _speciesRepository;
 
     public UpdatePlantCommandHandler(
         IPlantRepository plantRepository,
-        ILocationRepository locationRepository)
+        ILocationRepository locationRepository,
+        ISpeciesRepository speciesRepository)
     {
         _plantRepository = plantRepository;
         _locationRepository = locationRepository;
+        _speciesRepository = speciesRepository;
     }
 
     public async Task<PlantResponse> Handle(UpdatePlantCommand request, CancellationToken cancellationToken)
@@ -32,6 +36,16 @@ public class UpdatePlantCommandHandler : IRequestHandler<UpdatePlantCommand, Pla
             throw new UnauthorizedAccessException("You don't have permission to update this plant.");
         }
 
+        // Validate species if provided
+        if (request.SpeciesId.HasValue)
+        {
+            var species = await _speciesRepository.GetByIdAsync(request.SpeciesId.Value, cancellationToken);
+            if (species == null || species.UserId != request.UserId)
+            {
+                throw new InvalidOperationException($"Species with ID {request.SpeciesId} not found or doesn't belong to user.");
+            }
+        }
+
         // Validate location if provided
         if (request.LocationId.HasValue)
         {
@@ -44,10 +58,8 @@ public class UpdatePlantCommandHandler : IRequestHandler<UpdatePlantCommand, Pla
 
         // Update plant properties
         plant.Name = request.Name;
-        plant.Species = request.Species;
+        plant.SpeciesId = request.SpeciesId;
         plant.Description = request.Description;
-        plant.WateringIntervalDays = request.WateringIntervalDays;
-        plant.FertilizationIntervalDays = request.FertilizationIntervalDays;
         plant.LocationId = request.LocationId;
 
         await _plantRepository.UpdateAsync(plant, cancellationToken);

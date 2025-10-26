@@ -17,6 +17,7 @@ public class PlantRepository : IPlantRepository
     public async Task<Plant?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Plants
+            .Include(p => p.Species)
             .Include(p => p.Location)
             .Include(p => p.Waterings.OrderByDescending(w => w.WateredAt).Take(1))
             .Include(p => p.Fertilizations.OrderByDescending(f => f.FertilizedAt).Take(1))
@@ -28,6 +29,7 @@ public class PlantRepository : IPlantRepository
     public async Task<IEnumerable<Plant>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Plants
+            .Include(p => p.Species)
             .Include(p => p.Location)
             .Include(p => p.Waterings.OrderByDescending(w => w.WateredAt).Take(1))
             .Include(p => p.Fertilizations.OrderByDescending(f => f.FertilizedAt).Take(1))
@@ -39,6 +41,7 @@ public class PlantRepository : IPlantRepository
     public async Task<IEnumerable<Plant>> GetAllByUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _context.Plants
+            .Include(p => p.Species)
             .Include(p => p.Location)
             .Include(p => p.Waterings.OrderByDescending(w => w.WateredAt).Take(1))
             .Include(p => p.Fertilizations.OrderByDescending(f => f.FertilizedAt).Take(1))

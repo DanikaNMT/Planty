@@ -14,10 +14,8 @@ namespace Planty.API.Tests.Controllers
             var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
             var request = new CreatePlantRequest(
                 "Watered Plant",
-                "Species",
+                null, // SpeciesId
                 "Desc",
-                3,
-                null, // FertilizationIntervalDays
                 null // LocationId
             );
             var createResponse = await authenticatedClient.PostAsJsonAsync("/api/plants", request);

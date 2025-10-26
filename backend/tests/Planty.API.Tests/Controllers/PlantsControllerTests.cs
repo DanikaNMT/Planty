@@ -49,10 +49,8 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
         var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
         var request = new CreatePlantRequest(
             "Test Plant",
-            "Test Species",
+            null, // SpeciesId
             "Test Description",
-            7,
-            null, // FertilizationIntervalDays
             null // LocationId
         );
 
@@ -64,9 +62,9 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
         var plant = await response.Content.ReadFromJsonAsync<PlantResponse>();
         plant.Should().NotBeNull();
         plant!.Name.Should().Be(request.Name);
-        plant.Species.Should().Be(request.Species);
+        plant.SpeciesId.Should().BeNull();
+        plant.SpeciesName.Should().BeNull();
         plant.Description.Should().Be(request.Description);
-        plant.WateringIntervalDays.Should().Be(request.WateringIntervalDays);
         plant.Location.Should().BeNull(); // Since LocationId is null, Location name should be null
     }
 
@@ -77,10 +75,8 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
         var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
         var request = new CreatePlantRequest(
             "My Plant",
-            null, // Species
+            null, // SpeciesId
             null, // Description
-            null, // WateringIntervalDays
-            null, // FertilizationIntervalDays
             null  // LocationId
         );
 
@@ -92,7 +88,7 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
         var plant = await response.Content.ReadFromJsonAsync<PlantResponse>();
         plant.Should().NotBeNull();
         plant!.Name.Should().Be(request.Name);
-        plant.Species.Should().BeNull();
+        plant.SpeciesName.Should().BeNull();
         plant.Description.Should().BeNull();
         plant.WateringIntervalDays.Should().BeNull();
         plant.Location.Should().BeNull();
