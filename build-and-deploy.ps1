@@ -27,15 +27,9 @@ dotnet clean --configuration Release
 # Navigate to project
 Set-Location $ProjectPath
 
-# Build process
-Write-Host "Restoring dependencies..." -ForegroundColor Yellow
-dotnet restore
-
-Write-Host "Building project..." -ForegroundColor Yellow
-dotnet build --configuration Release --no-restore
-
+# Build and publish in one step to ensure everything is rebuilt
 Write-Host "Publishing for Linux ARM (32-bit)..." -ForegroundColor Yellow
-dotnet publish --configuration Release --output $OutputPath --runtime linux-arm --self-contained true --no-build
+dotnet publish --configuration Release --output $OutputPath --runtime linux-arm --self-contained true
 
 Write-Host "Publishing migration tool..." -ForegroundColor Yellow
 Set-Location "C:\Users\arnod\repos\Planty\backend\src\Planty.MigrationTool"
