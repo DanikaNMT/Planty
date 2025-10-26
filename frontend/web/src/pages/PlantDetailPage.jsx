@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPlant, waterPlant, fertilizePlant, getPlantCareHistory, uploadPlantPicture } from '../api/plants.js';
+import { getPlant, waterPlant, fertilizePlant, getPlantCareHistory, uploadPlantPicture, updatePlant } from '../api/plants.js';
 import { Loading } from '../components/Loading.jsx';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
 import { formatDate } from '../utils/formatDate.js';
@@ -17,12 +17,31 @@ export function PlantDetailPage({ id, navigate }) {
   const [waterSuccess, setWaterSuccess] = useState(false);
   const [fertilizeSuccess, setFertilizeSuccess] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    species: '',
+    description: '',
+    wateringIntervalDays: '',
+    fertilizationIntervalDays: ''
+  });
 
   useEffect(() => {
     setLoading(true);
     setError(null);
     getPlant(id)
-      .then(setPlant)
+      .then(plant => {
+        setPlant(plant);
+        // Initialize edit form with plant data
+        setEditForm({
+          name: plant.name || '',
+          species: plant.species || '',
+          description: plant.description || '',
+          wateringIntervalDays: plant.wateringIntervalDays || '',
+          fertilizationIntervalDays: plant.fertilizationIntervalDays || ''
+        });
+      })
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
     
@@ -113,6 +132,53 @@ export function PlantDetailPage({ id, navigate }) {
     }
   };
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setError(null);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setError(null);
+    // Reset form to current plant data
+    setEditForm({
+      name: plant.name || '',
+      species: plant.species || '',
+      description: plant.description || '',
+      wateringIntervalDays: plant.wateringIntervalDays || '',
+      fertilizationIntervalDays: plant.fertilizationIntervalDays || ''
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (saving) return;
+    
+    setSaving(true);
+    setError(null);
+    
+    try {
+      const updatedPlant = await updatePlant(id, editForm);
+      setPlant(updatedPlant);
+      setIsEditing(false);
+      // Update edit form with saved data
+      setEditForm({
+        name: updatedPlant.name || '',
+        species: updatedPlant.species || '',
+        description: updatedPlant.description || '',
+        wateringIntervalDays: updatedPlant.wateringIntervalDays || '',
+        fertilizationIntervalDays: updatedPlant.fertilizationIntervalDays || ''
+      });
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleFormChange = (field, value) => {
+    setEditForm(prev => ({ ...prev, [field]: value }));
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 'var(--spacing-lg)' }}>
@@ -163,7 +229,7 @@ export function PlantDetailPage({ id, navigate }) {
       {plant && (
         <div>
           <div className="plant-detail-header">
-            {plant.latestPictureUrl && (
+            {plant.latestPictureUrl && !isEditing && (
               <div className="plant-detail-image">
                 <img 
                   src={plant.latestPictureUrl} 
@@ -174,66 +240,194 @@ export function PlantDetailPage({ id, navigate }) {
             )}
             
             <div className="plant-detail-info">
-              <h2 className="plant-detail-title">🪴 {plant.name}</h2>
-              
-              <div className="plant-detail-meta">
-                {plant.species && (
-                  <div className="plant-detail-item">
-                    <span className="plant-detail-label">🌺 Species:</span>
-                    <span className="plant-detail-value">{plant.species}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-md)' }}>
+                {isEditing ? (
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
+                      Plant Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.name}
+                      onChange={(e) => handleFormChange('name', e.target.value)}
+                      placeholder="Enter plant name"
+                      required
+                      style={{
+                        width: '100%',
+                        padding: 'var(--spacing-sm) var(--spacing-md)',
+                        border: '2px solid var(--color-border)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '1.5rem',
+                        fontWeight: '700',
+                      }}
+                    />
                   </div>
+                ) : (
+                  <h2 className="plant-detail-title">🪴 {plant.name}</h2>
                 )}
-                {plant.description && (
-                  <div className="plant-detail-item">
-                    <span className="plant-detail-label">📝 Description:</span>
-                    <span className="plant-detail-value">{plant.description}</span>
-                  </div>
-                )}
-                <div className="plant-detail-item">
-                  <span className="plant-detail-label">📅 Date Added:</span>
-                  <span className="plant-detail-value">{formatDate(plant.dateAdded)}</span>
-                </div>
-                <div className="plant-detail-item">
-                  <span className="plant-detail-label">💧 Last Watered:</span>
-                  <span className="plant-detail-value">{plant.lastWatered ? formatDate(plant.lastWatered) : 'Never'}</span>
-                </div>
-                {plant.wateringIntervalDays && (
-                  <div className="plant-detail-item">
-                    <span className="plant-detail-label">⏰ Watering Interval:</span>
-                    <span className="plant-detail-value">Every {plant.wateringIntervalDays} days</span>
-                  </div>
-                )}
-                {plant.nextWateringDue && (
-                  <div className="plant-detail-item">
-                    <span className="plant-detail-label">🔔 Next Watering:</span>
-                    <span className="plant-detail-value">{formatDate(plant.nextWateringDue)}</span>
-                  </div>
-                )}
-                <div className="plant-detail-item">
-                  <span className="plant-detail-label">🌿 Last Fertilized:</span>
-                  <span className="plant-detail-value">{plant.lastFertilized ? formatDate(plant.lastFertilized) : 'Never'}</span>
-                </div>
-                {plant.fertilizationIntervalDays && (
-                  <div className="plant-detail-item">
-                    <span className="plant-detail-label">⏰ Fertilization Interval:</span>
-                    <span className="plant-detail-value">Every {plant.fertilizationIntervalDays} days</span>
-                  </div>
-                )}
-                {plant.nextFertilizationDue && (
-                  <div className="plant-detail-item">
-                    <span className="plant-detail-label">🔔 Next Fertilization:</span>
-                    <span className="plant-detail-value">{formatDate(plant.nextFertilizationDue)}</span>
-                  </div>
-                )}
-                {plant.location && (
-                  <div className="plant-detail-item">
-                    <span className="plant-detail-label">📍 Location:</span>
-                    <span className="plant-detail-value">{plant.location}</span>
-                  </div>
+                {!isEditing && (
+                  <button onClick={handleEditClick} className="btn-outline btn-small">
+                    ✏️ Edit
+                  </button>
                 )}
               </div>
               
-              <div className="plant-actions">
+              {isEditing ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
+                      Species
+                    </label>
+                    <input
+                      type="text"
+                      value={editForm.species}
+                      onChange={(e) => handleFormChange('species', e.target.value)}
+                      placeholder="e.g., Monstera deliciosa"
+                      style={{
+                        width: '100%',
+                        padding: 'var(--spacing-sm) var(--spacing-md)',
+                        border: '2px solid var(--color-border)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '1rem',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
+                      Description
+                    </label>
+                    <textarea
+                      value={editForm.description}
+                      onChange={(e) => handleFormChange('description', e.target.value)}
+                      placeholder="Add notes about your plant..."
+                      rows="3"
+                      style={{
+                        width: '100%',
+                        padding: 'var(--spacing-sm) var(--spacing-md)',
+                        border: '2px solid var(--color-border)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '1rem',
+                        resize: 'vertical',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
+                      Watering Interval (days)
+                    </label>
+                    <input
+                      type="number"
+                      value={editForm.wateringIntervalDays}
+                      onChange={(e) => handleFormChange('wateringIntervalDays', e.target.value)}
+                      placeholder="e.g., 7"
+                      min="1"
+                      style={{
+                        width: '100%',
+                        padding: 'var(--spacing-sm) var(--spacing-md)',
+                        border: '2px solid var(--color-border)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '1rem',
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
+                      Fertilization Interval (days)
+                    </label>
+                    <input
+                      type="number"
+                      value={editForm.fertilizationIntervalDays}
+                      onChange={(e) => handleFormChange('fertilizationIntervalDays', e.target.value)}
+                      placeholder="e.g., 30"
+                      min="1"
+                      style={{
+                        width: '100%',
+                        padding: 'var(--spacing-sm) var(--spacing-md)',
+                        border: '2px solid var(--color-border)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '1rem',
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: 'var(--spacing-sm)', marginTop: 'var(--spacing-md)' }}>
+                    <button
+                      onClick={handleSaveEdit}
+                      disabled={saving || !editForm.name.trim()}
+                      className="btn-large"
+                      style={{ flex: 1 }}
+                    >
+                      {saving ? '⏳ Saving...' : '💾 Save Changes'}
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      disabled={saving}
+                      className="btn-outline btn-large"
+                      style={{ flex: 1 }}
+                    >
+                      ❌ Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="plant-detail-meta">
+                    {plant.species && (
+                      <div className="plant-detail-item">
+                        <span className="plant-detail-label">🌺 Species:</span>
+                        <span className="plant-detail-value">{plant.species}</span>
+                      </div>
+                    )}
+                    {plant.description && (
+                      <div className="plant-detail-item">
+                        <span className="plant-detail-label">📝 Description:</span>
+                        <span className="plant-detail-value">{plant.description}</span>
+                      </div>
+                    )}
+                    <div className="plant-detail-item">
+                      <span className="plant-detail-label">📅 Date Added:</span>
+                      <span className="plant-detail-value">{formatDate(plant.dateAdded)}</span>
+                    </div>
+                    <div className="plant-detail-item">
+                      <span className="plant-detail-label">💧 Last Watered:</span>
+                      <span className="plant-detail-value">{plant.lastWatered ? formatDate(plant.lastWatered) : 'Never'}</span>
+                    </div>
+                    {plant.wateringIntervalDays && (
+                      <div className="plant-detail-item">
+                        <span className="plant-detail-label">⏰ Watering Interval:</span>
+                        <span className="plant-detail-value">Every {plant.wateringIntervalDays} days</span>
+                      </div>
+                    )}
+                    {plant.nextWateringDue && (
+                      <div className="plant-detail-item">
+                        <span className="plant-detail-label">🔔 Next Watering:</span>
+                        <span className="plant-detail-value">{formatDate(plant.nextWateringDue)}</span>
+                      </div>
+                    )}
+                    <div className="plant-detail-item">
+                      <span className="plant-detail-label">🌿 Last Fertilized:</span>
+                      <span className="plant-detail-value">{plant.lastFertilized ? formatDate(plant.lastFertilized) : 'Never'}</span>
+                    </div>
+                    {plant.fertilizationIntervalDays && (
+                      <div className="plant-detail-item">
+                        <span className="plant-detail-label">⏰ Fertilization Interval:</span>
+                        <span className="plant-detail-value">Every {plant.fertilizationIntervalDays} days</span>
+                      </div>
+                    )}
+                    {plant.nextFertilizationDue && (
+                      <div className="plant-detail-item">
+                        <span className="plant-detail-label">🔔 Next Fertilization:</span>
+                        <span className="plant-detail-value">{formatDate(plant.nextFertilizationDue)}</span>
+                      </div>
+                    )}
+                    {plant.location && (
+                      <div className="plant-detail-item">
+                        <span className="plant-detail-label">📍 Location:</span>
+                        <span className="plant-detail-value">{plant.location}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="plant-actions">
                 <button
                   onClick={handleWaterPlant}
                   disabled={watering}
@@ -267,6 +461,8 @@ export function PlantDetailPage({ id, navigate }) {
                   </button>
                 </label>
               </div>
+                </>
+              )}
             </div>
           </div>
 

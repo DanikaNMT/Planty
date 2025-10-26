@@ -3,6 +3,7 @@ namespace Planty.API.Controllers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Planty.Application.Commands.CreatePlant;
+using Planty.Application.Commands.UpdatePlant;
 using Planty.Application.Commands.FertilizePlant;
 using Planty.Application.Queries.GetPlantById;
 using Planty.Application.Queries.GetPlants;
@@ -79,6 +80,37 @@ public class PlantsController : ControllerBase
         var result = await _mediator.Send(command, cancellationToken);
         return CreatedAtAction(nameof(GetPlant), new { id = result.Id }, result);
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<PlantResponse>> UpdatePlant(Guid id, UpdatePlantRequest request, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        try
+        {
+            var command = new UpdatePlantCommand(
+                id,
+                Guid.Parse(userId),
+                request.Name,
+                request.Species,
+                request.Description,
+                request.WateringIntervalDays,
+                request.FertilizationIntervalDays,
+                request.LocationId
+            );
+            var result = await _mediator.Send(command, cancellationToken);
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Forbid();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
+
     [HttpPost("{id:guid}/water")]
     public async Task<ActionResult<PlantResponse>> WaterPlant(Guid id, CancellationToken cancellationToken)
     {

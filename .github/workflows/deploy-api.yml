@@ -1,4 +1,3 @@
-name: Test Api
 
 on:
   workflow_dispatch:

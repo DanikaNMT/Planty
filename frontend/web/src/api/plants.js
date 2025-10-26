@@ -26,6 +26,20 @@ export function createPlant(data) {
   });
 }
 
+export function updatePlant(id, data) {
+  return apiFetch(`/api/plants/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      name: data.name,
+      species: data.species || null,
+      description: data.description || null,
+      wateringIntervalDays: data.wateringIntervalDays ? Number(data.wateringIntervalDays) : null,
+      fertilizationIntervalDays: data.fertilizationIntervalDays ? Number(data.fertilizationIntervalDays) : null,
+      locationId: data.locationId || null
+    })
+  });
+}
+
 export function waterPlant(id) {
   return apiFetch(`/api/plants/${id}/water`, {
     method: 'POST'
