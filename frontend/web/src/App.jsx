@@ -11,6 +11,7 @@ import { SpeciesDetailPage } from './pages/SpeciesDetailPage.jsx';
 import { LocationsPage } from './pages/LocationsPage.jsx';
 import { NewLocationPage } from './pages/NewLocationPage.jsx';
 import { LocationDetailPage } from './pages/LocationDetailPage.jsx';
+import { SettingsPage } from './pages/SettingsPage.jsx';
 
 export default function App() {
   const { route, navigate } = useRouter();
@@ -55,6 +56,8 @@ export default function App() {
       page = <NewLocationPage navigate={navigate} />; break;
     case 'location-detail':
       page = <LocationDetailPage id={route.id} navigate={navigate} />; break;
+    case 'settings':
+      page = <SettingsPage navigate={navigate} />; break;
     default:
       page = (
         <div className="empty-state">
@@ -85,6 +88,9 @@ export default function App() {
           </button>
           <button onClick={() => navigate('/todos')} className="btn-outline btn-small">
             ✅ Todos
+          </button>
+          <button onClick={() => navigate('/settings')} className="btn-outline btn-small">
+            ⚙️ Settings
           </button>
           <button onClick={handleLogout} className="btn-outline btn-small">
             👋 Logout
