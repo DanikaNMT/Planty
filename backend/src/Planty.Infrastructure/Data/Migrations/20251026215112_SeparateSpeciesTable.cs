@@ -46,7 +46,7 @@ namespace Planty.Infrastructure.Data.Migrations
             migrationBuilder.Sql(@"
                 INSERT INTO Species (Id, Name, WateringIntervalDays, FertilizationIntervalDays, UserId)
                 SELECT 
-                    lower(hex(randomblob(4))) || '-' || lower(hex(randomblob(2))) || '-' || '4' || substr(lower(hex(randomblob(2))),2) || '-' || 'a' || substr(lower(hex(randomblob(2))),2) || '-' || lower(hex(randomblob(6))) as Id,
+                    upper(hex(randomblob(4))) || '-' || upper(hex(randomblob(2))) || '-' || '4' || substr(upper(hex(randomblob(2))),2) || '-' || 'A' || substr(upper(hex(randomblob(2))),2) || '-' || upper(hex(randomblob(6))) as Id,
                     COALESCE(Species, 'Unknown') as Name,
                     WateringIntervalDays,
                     FertilizationIntervalDays,
