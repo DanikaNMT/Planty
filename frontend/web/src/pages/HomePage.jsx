@@ -98,8 +98,18 @@ export function HomePage({ navigate }) {
       
       <div>
         {plants.map(p => (
-          <div key={p.id}>
-            <div>
+          <div key={p.id} style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginBottom: '20px', padding: '15px', border: '1px solid #ddd', borderRadius: '8px' }}>
+            {p.latestPictureUrl && (
+              <div style={{ flexShrink: 0 }}>
+                <img 
+                  src={p.latestPictureUrl} 
+                  alt={p.name}
+                  style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px' }}
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+            )}
+            <div style={{ flex: 1 }}>
               <Link to={`/plant/${p.id}`} navigate={navigate}>
                 {p.name}{p.species ? ` - ${p.species}` : ''}
               </Link>
@@ -119,19 +129,22 @@ export function HomePage({ navigate }) {
                   Next fertilization: {formatDate(p.nextFertilizationDue)}
                 </div>
               )}
+              <div style={{ marginTop: '10px' }}>
+                <button
+                  onClick={() => handleWaterPlant(p.id, p.name)}
+                  disabled={wateringStates[p.id]}
+                >
+                  {wateringStates[p.id] ? 'Watering...' : '💧 Water'}
+                </button>
+                <button
+                  onClick={() => handleFertilizePlant(p.id, p.name)}
+                  disabled={fertilizingStates[p.id]}
+                  style={{ marginLeft: '10px' }}
+                >
+                  {fertilizingStates[p.id] ? 'Fertilizing...' : '🌿 Fertilize'}
+                </button>
+              </div>
             </div>
-            <button
-              onClick={() => handleWaterPlant(p.id, p.name)}
-              disabled={wateringStates[p.id]}
-            >
-              {wateringStates[p.id] ? 'Watering...' : '💧 Water'}
-            </button>
-            <button
-              onClick={() => handleFertilizePlant(p.id, p.name)}
-              disabled={fertilizingStates[p.id]}
-            >
-              {fertilizingStates[p.id] ? 'Fertilizing...' : '🌿 Fertilize'}
-            </button>
           </div>
         ))}
       </div>

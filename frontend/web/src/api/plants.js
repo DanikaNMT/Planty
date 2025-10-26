@@ -45,3 +45,16 @@ export function getPlantFertilizations(id) {
 export function getPlantCareHistory(id) {
   return apiFetch(`/api/plants/${id}/care-history`);
 }
+
+export function uploadPlantPicture(id, file, notes = null) {
+  const formData = new FormData();
+  formData.append('file', file);
+  if (notes) {
+    formData.append('notes', notes);
+  }
+  
+  return apiFetch(`/api/plants/${id}/pictures`, {
+    method: 'POST',
+    body: formData
+  });
+}

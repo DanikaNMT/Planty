@@ -13,6 +13,7 @@ public class PlantDbContext : DbContext
     public DbSet<Location> Locations { get; set; } = null!;
     public DbSet<Watering> Waterings { get; set; } = null!;
     public DbSet<Fertilization> Fertilizations { get; set; } = null!;
+    public DbSet<PlantPicture> PlantPictures { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,6 +49,11 @@ public class PlantDbContext : DbContext
                   .WithOne(f => f.Plant)
                   .HasForeignKey(f => f.PlantId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(e => e.Pictures)
+                  .WithOne(p => p.Plant)
+                  .HasForeignKey(p => p.PlantId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Watering>(entity =>
@@ -64,6 +70,15 @@ public class PlantDbContext : DbContext
             entity.Property(e => e.FertilizedAt).IsRequired();
             entity.Property(e => e.Notes).HasMaxLength(500);
             entity.HasIndex(e => new { e.PlantId, e.FertilizedAt });
+        });
+
+        modelBuilder.Entity<PlantPicture>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.TakenAt).IsRequired();
+            entity.Property(e => e.FilePath).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.HasIndex(e => new { e.PlantId, e.TakenAt });
         });
 
         modelBuilder.Entity<User>(entity =>

@@ -24,4 +24,7 @@ public class Plant
     
     // Fertilization history
     public ICollection<Fertilization> Fertilizations { get; set; } = new List<Fertilization>();
+    
+    // Picture history
+    public ICollection<PlantPicture> Pictures { get; set; } = new List<PlantPicture>();
 }

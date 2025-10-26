@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPlant, waterPlant, fertilizePlant, getPlantCareHistory } from '../api/plants.js';
+import { getPlant, waterPlant, fertilizePlant, getPlantCareHistory, uploadPlantPicture } from '../api/plants.js';
 import { Loading } from '../components/Loading.jsx';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
 import { formatDate } from '../utils/formatDate.js';
@@ -13,8 +13,10 @@ export function PlantDetailPage({ id, navigate }) {
   const [error, setError] = useState(null);
   const [watering, setWatering] = useState(false);
   const [fertilizing, setFertilizing] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [waterSuccess, setWaterSuccess] = useState(false);
   const [fertilizeSuccess, setFertilizeSuccess] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -80,6 +82,37 @@ export function PlantDetailPage({ id, navigate }) {
     }
   };
 
+  const handlePictureUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    setUploading(true);
+    setError(null);
+    setWaterSuccess(false);
+    setFertilizeSuccess(false);
+    setUploadSuccess(false);
+    
+    try {
+      await uploadPlantPicture(id, file);
+      setUploadSuccess(true);
+      // Reload plant and care history
+      const [updatedPlant, updatedHistory] = await Promise.all([
+        getPlant(id),
+        getPlantCareHistory(id)
+      ]);
+      setPlant(updatedPlant);
+      setCareHistory(updatedHistory);
+      // Clear success message after 3 seconds
+      setTimeout(() => setUploadSuccess(false), 3000);
+      // Reset file input
+      event.target.value = '';
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div>
       <div>
@@ -101,11 +134,30 @@ export function PlantDetailPage({ id, navigate }) {
         </div>
       )}
 
+      {uploadSuccess && (
+        <div>
+          Picture uploaded successfully! 📸
+        </div>
+      )}
+
       {!loading && !plant && !error && <div>Not found.</div>}
       
       {plant && (
         <div>
           <h2>{plant.name}</h2>
+          
+          {/* Latest Picture Display */}
+          {plant.latestPictureUrl && (
+            <div style={{ marginBottom: '20px' }}>
+              <img 
+                src={plant.latestPictureUrl} 
+                alt={`Latest picture of ${plant.name}`}
+                style={{ maxWidth: '400px', maxHeight: '400px', objectFit: 'contain', borderRadius: '8px', border: '1px solid #ddd' }}
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          )}
+          
           {plant.species && (
             <div>
               <strong>Species:</strong> {plant.species}
@@ -170,6 +222,23 @@ export function PlantDetailPage({ id, navigate }) {
             >
               {fertilizing ? 'Fertilizing...' : '🌿 Fertilize Plant'}
             </button>
+            <label style={{ marginLeft: '10px', display: 'inline-block' }}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePictureUpload}
+                disabled={uploading}
+                style={{ display: 'none' }}
+                id="picture-upload"
+              />
+              <button
+                onClick={() => document.getElementById('picture-upload').click()}
+                disabled={uploading}
+                style={{ cursor: 'pointer' }}
+              >
+                {uploading ? 'Uploading...' : '📸 Add Picture'}
+              </button>
+            </label>
           </div>
 
           {/* Care History */}
@@ -177,15 +246,29 @@ export function PlantDetailPage({ id, navigate }) {
             <h3>Care History</h3>
             {loadingHistory && <p>Loading history...</p>}
             {careHistory.length === 0 && !loadingHistory && (
-              <p>No care history yet. Water or fertilize your plant to start tracking!</p>
+              <p>No care history yet. Water, fertilize, or add a picture to start tracking!</p>
             )}
             {careHistory.length > 0 && (
               <ul style={{ listStyle: 'none', padding: 0 }}>
                 {careHistory.map(event => (
-                  <li key={event.id} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                  <li key={event.id} style={{ marginBottom: '15px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
                     <div>
-                      <strong>{event.type === 'Watering' ? '💧' : '🌿'} {event.type}:</strong> {formatDate(event.timestamp)}
+                      <strong>
+                        {event.type === 'Watering' && '💧'}
+                        {event.type === 'Fertilization' && '🌿'}
+                        {event.type === 'Picture' && '📸'}
+                        {' '}{event.type}:
+                      </strong> {formatDate(event.timestamp)}
                     </div>
+                    {event.imageUrl && (
+                      <div style={{ marginTop: '10px' }}>
+                        <img 
+                          src={event.imageUrl} 
+                          alt="Plant picture"
+                          style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain', borderRadius: '4px' }}
+                        />
+                      </div>
+                    )}
                     {event.notes && (
                       <div style={{ marginTop: '5px', fontStyle: 'italic' }}>
                         Note: {event.notes}

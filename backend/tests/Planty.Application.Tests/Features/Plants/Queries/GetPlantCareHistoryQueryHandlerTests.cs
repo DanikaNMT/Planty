@@ -12,6 +12,7 @@ public class GetPlantCareHistoryQueryHandlerTests
     private readonly Mock<IPlantRepository> _plantRepository;
     private readonly Mock<IWateringRepository> _wateringRepository;
     private readonly Mock<IFertilizationRepository> _fertilizationRepository;
+    private readonly Mock<IPlantPictureRepository> _pictureRepository;
     private readonly GetPlantCareHistoryQueryHandler _handler;
     private readonly Guid _userId;
 
@@ -20,10 +21,12 @@ public class GetPlantCareHistoryQueryHandlerTests
         _plantRepository = new Mock<IPlantRepository>();
         _wateringRepository = new Mock<IWateringRepository>();
         _fertilizationRepository = new Mock<IFertilizationRepository>();
+        _pictureRepository = new Mock<IPlantPictureRepository>();
         _handler = new GetPlantCareHistoryQueryHandler(
             _plantRepository.Object, 
             _wateringRepository.Object,
-            _fertilizationRepository.Object);
+            _fertilizationRepository.Object,
+            _pictureRepository.Object);
         _userId = Guid.NewGuid();
     }
 
@@ -106,6 +109,8 @@ public class GetPlantCareHistoryQueryHandlerTests
             .ReturnsAsync(waterings);
         _fertilizationRepository.Setup(r => r.GetByPlantIdAsync(plantId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Fertilization>());
+        _pictureRepository.Setup(r => r.GetByPlantIdAsync(plantId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<PlantPicture>());
 
         // Act
         var result = await _handler.Handle(request, CancellationToken.None);

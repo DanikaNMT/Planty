@@ -9,15 +9,18 @@ public class GetPlantCareHistoryQueryHandler : IRequestHandler<GetPlantCareHisto
     private readonly IPlantRepository _plantRepository;
     private readonly IWateringRepository _wateringRepository;
     private readonly IFertilizationRepository _fertilizationRepository;
+    private readonly IPlantPictureRepository _pictureRepository;
 
     public GetPlantCareHistoryQueryHandler(
         IPlantRepository plantRepository, 
         IWateringRepository wateringRepository,
-        IFertilizationRepository fertilizationRepository)
+        IFertilizationRepository fertilizationRepository,
+        IPlantPictureRepository pictureRepository)
     {
         _plantRepository = plantRepository;
         _wateringRepository = wateringRepository;
         _fertilizationRepository = fertilizationRepository;
+        _pictureRepository = pictureRepository;
     }
 
     public async Task<IEnumerable<CareEventResponse>> Handle(GetPlantCareHistoryQuery request, CancellationToken cancellationToken)
@@ -30,25 +33,37 @@ public class GetPlantCareHistoryQueryHandler : IRequestHandler<GetPlantCareHisto
         // Get both watering and fertilization events
         var waterings = await _wateringRepository.GetByPlantIdAsync(request.PlantId, cancellationToken);
         var fertilizations = await _fertilizationRepository.GetByPlantIdAsync(request.PlantId, cancellationToken);
+        var pictures = await _pictureRepository.GetByPlantIdAsync(request.PlantId, cancellationToken);
 
         // Convert to care events
         var wateringEvents = waterings.Select(w => new CareEventResponse(
             w.Id,
             "Watering",
             w.WateredAt,
-            w.Notes
+            w.Notes,
+            null
         ));
 
         var fertilizationEvents = fertilizations.Select(f => new CareEventResponse(
             f.Id,
             "Fertilization",
             f.FertilizedAt,
-            f.Notes
+            f.Notes,
+            null
+        ));
+
+        var pictureEvents = pictures.Select(p => new CareEventResponse(
+            p.Id,
+            "Picture",
+            p.TakenAt,
+            p.Notes,
+            $"/api/plants/pictures/{p.Id}"
         ));
 
         // Combine and sort by timestamp descending (most recent first)
         return wateringEvents
             .Concat(fertilizationEvents)
+            .Concat(pictureEvents)
             .OrderByDescending(e => e.Timestamp)
             .ToList();
     }

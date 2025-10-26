@@ -2,8 +2,15 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5153';
 
 export async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('jwt');
-  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  
+  // Don't set Content-Type for FormData (browser will set it with boundary)
+  const headers = { ...(options.headers || {}) };
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+  
   if (token) headers['Authorization'] = `Bearer ${token}`;
+  
   const res = await fetch(`${API_BASE}${path}`, {
     headers,
     ...options

@@ -12,6 +12,7 @@ public static class PlantMapper
     {
         var lastWatered = plant.Waterings.OrderByDescending(w => w.WateredAt).FirstOrDefault()?.WateredAt;
         var lastFertilized = plant.Fertilizations.OrderByDescending(f => f.FertilizedAt).FirstOrDefault()?.FertilizedAt;
+        var latestPicture = plant.Pictures.OrderByDescending(p => p.TakenAt).FirstOrDefault();
         
         DateTime? nextWateringDue = CalculateNextDue(lastWatered, plant.DateAdded, plant.WateringIntervalDays);
         DateTime? nextFertilizationDue = CalculateNextDue(lastFertilized, plant.DateAdded, plant.FertilizationIntervalDays);
@@ -29,7 +30,8 @@ public static class PlantMapper
             nextWateringDue,
             lastFertilized,
             plant.FertilizationIntervalDays,
-            nextFertilizationDue
+            nextFertilizationDue,
+            latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null
         );
     }
 

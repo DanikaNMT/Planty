@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Planty.Application;
+using Planty.Application.Services;
 using Planty.Infrastructure;
 using Planty.Infrastructure.Data;
+using Planty.Infrastructure.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,6 +76,24 @@ builder.Services.AddAuthentication(options =>
 // Add application layers
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Register file storage service
+builder.Services.AddSingleton<IFileStorageService>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var env = sp.GetRequiredService<IWebHostEnvironment>();
+    
+    // Get uploads path from configuration, defaulting to data/uploads
+    var uploadsPath = configuration["Storage:UploadsPath"] ?? "data/uploads";
+    
+    // If it's a relative path, make it relative to ContentRootPath
+    if (!Path.IsPathRooted(uploadsPath))
+    {
+        uploadsPath = Path.Combine(env.ContentRootPath, uploadsPath);
+    }
+    
+    return new FileStorageService(uploadsPath);
+});
 
 // Add CORS for frontend
 builder.Services.AddCors(options =>

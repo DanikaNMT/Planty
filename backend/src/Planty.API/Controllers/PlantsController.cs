@@ -10,6 +10,7 @@ using Planty.Application.Queries.GetPlantWaterings;
 using Planty.Application.Queries.GetPlantFertilizations;
 using Planty.Application.Queries.GetPlantCareHistory;
 using Planty.Application.Commands.WaterPlant;
+using Planty.Application.Commands.UploadPlantPicture;
 using Planty.Contracts.Plants;
 
 using Microsoft.AspNetCore.Authorization;

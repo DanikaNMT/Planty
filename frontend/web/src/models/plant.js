@@ -13,6 +13,7 @@
  * @property {string | null} lastFertilized
  * @property {number | null} fertilizationIntervalDays
  * @property {string | null} nextFertilizationDue
+ * @property {string | null} latestPictureUrl
  */
 
 /**
@@ -27,6 +28,15 @@
  * @property {string} id
  * @property {string} fertilizedAt
  * @property {string | null} notes
+ */
+
+/**
+ * @typedef {Object} CareEvent
+ * @property {string} id
+ * @property {string} type - "Watering", "Fertilization", or "Picture"
+ * @property {string} timestamp
+ * @property {string | null} notes
+ * @property {string | null} imageUrl - Only for Picture type
  */
 
 /**

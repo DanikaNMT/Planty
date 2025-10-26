@@ -16,6 +16,7 @@ APP_DIR="/opt/planty-api"
 BACKUP_DIR="/opt/planty-api-backup"
 DEPLOY_DIR="/home/deploy/deployments"
 SERVICE_NAME="planty-api"
+DATA_DIR="/opt/planty-data"
 
 echo "Starting deployment..."
 
@@ -39,6 +40,12 @@ echo "Setting permissions..."
 chown -R planty:planty $APP_DIR
 chmod +x $APP_DIR/Planty.API
 chmod +x $APP_DIR/Planty.MigrationTool
+
+# Ensure data directory exists with correct permissions
+echo "Setting up data directory..."
+mkdir -p $DATA_DIR/uploads/plant-pictures
+chown -R planty:planty $DATA_DIR
+chmod -R 755 $DATA_DIR
 
 # Apply database migrations
 echo "Applying database migrations..."

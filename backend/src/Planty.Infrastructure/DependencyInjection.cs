@@ -3,9 +3,11 @@ namespace Planty.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Planty.Application.Services;
 using Planty.Domain.Repositories;
 using Planty.Infrastructure.Data;
 using Planty.Infrastructure.Repositories;
+using Planty.Infrastructure.Services;
 
 public static class DependencyInjection
 {
@@ -20,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<ILocationRepository, LocationRepository>();
         services.AddScoped<IWateringRepository, WateringRepository>();
         services.AddScoped<IFertilizationRepository, FertilizationRepository>();
+        services.AddScoped<IPlantPictureRepository, PlantPictureRepository>();
 
         // Register MediatR handlers from this assembly (for WaterPlantCommandHandler)
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
