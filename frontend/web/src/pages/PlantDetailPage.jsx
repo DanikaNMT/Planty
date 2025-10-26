@@ -61,9 +61,11 @@ export function PlantDetailPage({ id, navigate }) {
       {plant && (
         <div>
           <h2>{plant.name}</h2>
-          <div>
-            <strong>Species:</strong> {plant.species}
-          </div>
+          {plant.species && (
+            <div>
+              <strong>Species:</strong> {plant.species}
+            </div>
+          )}
           {plant.description && (
             <div>
               <strong>Description:</strong> {plant.description}
@@ -75,9 +77,11 @@ export function PlantDetailPage({ id, navigate }) {
           <div>
             <strong>Last Watered:</strong> {plant.lastWatered ? formatDate(plant.lastWatered) : 'Never'}
           </div>
-          <div>
-            <strong>Watering Interval (days):</strong> {plant.wateringIntervalDays}
-          </div>
+          {plant.wateringIntervalDays && (
+            <div>
+              <strong>Watering Interval (days):</strong> {plant.wateringIntervalDays}
+            </div>
+          )}
           {plant.location && (
             <div>
               <strong>Location:</strong> {plant.location}

@@ -22,8 +22,12 @@ public class GetPlantsQueryHandler : IRequestHandler<GetPlantsQuery, IEnumerable
 
     private static PlantResponse MapToResponse(Plant plant)
     {
-        var nextWateringDue = plant.LastWatered?.AddDays(plant.WateringIntervalDays) ?? 
-                             plant.DateAdded.AddDays(plant.WateringIntervalDays);
+        DateTime? nextWateringDue = null;
+        if (plant.WateringIntervalDays.HasValue)
+        {
+            nextWateringDue = plant.LastWatered?.AddDays(plant.WateringIntervalDays.Value) ?? 
+                             plant.DateAdded.AddDays(plant.WateringIntervalDays.Value);
+        }
 
         return new PlantResponse(
             plant.Id,

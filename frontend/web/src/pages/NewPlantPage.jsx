@@ -29,7 +29,7 @@ export function NewPlantPage({ navigate }) {
         </div>
         <div>
           <label>Species </label>
-            <input value={data.species} onChange={e => setData({ ...data, species: e.target.value })} required />
+            <input value={data.species} onChange={e => setData({ ...data, species: e.target.value })} />
         </div>
         <div>
           <label>Description </label>
@@ -37,7 +37,7 @@ export function NewPlantPage({ navigate }) {
         </div>
         <div>
           <label>Watering Interval Days </label>
-          <input type="number" value={data.wateringIntervalDays} onChange={e => setData({ ...data, wateringIntervalDays: e.target.value })} required />
+          <input type="number" value={data.wateringIntervalDays} onChange={e => setData({ ...data, wateringIntervalDays: e.target.value })} />
         </div>
         <div>
           <label>Location </label>

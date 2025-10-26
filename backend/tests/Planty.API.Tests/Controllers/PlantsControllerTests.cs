@@ -70,6 +70,34 @@ public partial class PlantsControllerTests : IClassFixture<CustomWebApplicationF
     }
 
     [Fact]
+    public async Task CreatePlant_WithOnlyName_ReturnsCreatedPlant()
+    {
+        // Arrange
+        var authenticatedClient = await _factory.CreateAuthenticatedClientAsync();
+        var request = new CreatePlantRequest(
+            "My Plant",
+            null, // Species
+            null, // Description
+            null, // WateringIntervalDays
+            null  // LocationId
+        );
+
+        // Act
+        var response = await authenticatedClient.PostAsJsonAsync("/api/plants", request);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var plant = await response.Content.ReadFromJsonAsync<PlantResponse>();
+        plant.Should().NotBeNull();
+        plant!.Name.Should().Be(request.Name);
+        plant.Species.Should().BeNull();
+        plant.Description.Should().BeNull();
+        plant.WateringIntervalDays.Should().BeNull();
+        plant.Location.Should().BeNull();
+        plant.NextWateringDue.Should().BeNull(); // No watering interval set
+    }
+
+    [Fact]
     public async Task GetPlantById_ReturnsNotFound_WhenPlantDoesNotExist()
     {
         // Arrange

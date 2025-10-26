@@ -13,9 +13,9 @@ export function createPlant(data) {
     method: 'POST',
     body: JSON.stringify({
       name: data.name,
-      species: data.species,
+      species: data.species || null,
       description: data.description || null,
-      wateringIntervalDays: Number(data.wateringIntervalDays) || 0,
+      wateringIntervalDays: data.wateringIntervalDays ? Number(data.wateringIntervalDays) : null,
       location: data.location || null
     })
   });

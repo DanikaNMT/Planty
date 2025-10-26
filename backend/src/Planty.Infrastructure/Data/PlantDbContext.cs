@@ -20,11 +20,11 @@ public class PlantDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Species).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Species).HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.ImageUrl).HasMaxLength(500);
             entity.Property(e => e.DateAdded).IsRequired();
-            entity.Property(e => e.WateringIntervalDays).IsRequired();
+            entity.Property(e => e.WateringIntervalDays);
 
             entity.HasOne(e => e.User)
                   .WithMany(u => u.Plants)

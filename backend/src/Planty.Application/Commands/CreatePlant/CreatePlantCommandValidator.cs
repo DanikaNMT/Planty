@@ -12,13 +12,14 @@ public class CreatePlantCommandValidator : AbstractValidator<CreatePlantCommand>
             .WithMessage("Plant name is required and must not exceed 100 characters");
 
         RuleFor(x => x.Species)
-            .NotEmpty()
             .MaximumLength(100)
-            .WithMessage("Plant species is required and must not exceed 100 characters");
+            .When(x => !string.IsNullOrEmpty(x.Species))
+            .WithMessage("Plant species must not exceed 100 characters");
 
         RuleFor(x => x.WateringIntervalDays)
             .GreaterThan(0)
             .LessThanOrEqualTo(365)
+            .When(x => x.WateringIntervalDays.HasValue)
             .WithMessage("Watering interval must be between 1 and 365 days");
 
         RuleFor(x => x.Description)

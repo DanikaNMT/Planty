@@ -5,9 +5,9 @@ using Planty.Contracts.Plants;
 
 public record CreatePlantCommand(
     string Name,
-    string Species,
+    string? Species,
     string? Description,
-    int WateringIntervalDays,
+    int? WateringIntervalDays,
     Guid? LocationId,
     Guid UserId
 ) : IRequest<PlantResponse>;

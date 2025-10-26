@@ -70,7 +70,7 @@ export function HomePage({ navigate }) {
           <div key={p.id}>
             <div>
               <Link to={`/plant/${p.id}`} navigate={navigate}>
-                {p.name} - {p.species}
+                {p.name}{p.species ? ` - ${p.species}` : ''}
               </Link>
               <div>
                 Last watered: {p.lastWatered ? formatDate(p.lastWatered) : 'Never'}
