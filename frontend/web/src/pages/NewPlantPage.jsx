@@ -84,17 +84,25 @@ export function NewPlantPage({ navigate }) {
           
           <div className="form-group">
             <label>📍 Location</label>
-            <select 
-              value={data.locationId} 
-              onChange={e => setData({ ...data, locationId: e.target.value })}
-            >
-              <option value="">No location</option>
-              {locations.map(l => (
-                <option key={l.id} value={l.id}>
-                  {l.name}
-                </option>
-              ))}
-            </select>
+            {locations.length === 0 ? (
+              <div>
+                <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--spacing-sm)' }}>
+                  No locations available. <a onClick={() => navigate('/locations/new')} style={{ cursor: 'pointer', textDecoration: 'underline', color: 'var(--color-primary)' }}>Create a location</a> to organize your plants.
+                </p>
+              </div>
+            ) : (
+              <select 
+                value={data.locationId} 
+                onChange={e => setData({ ...data, locationId: e.target.value })}
+              >
+                <option value="">No location</option>
+                {locations.map(l => (
+                  <option key={l.id} value={l.id}>
+                    {l.name}
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
           
           <button type="submit" disabled={creating} className="btn-large" style={{ width: '100%' }}>

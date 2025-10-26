@@ -414,7 +414,7 @@ export function PlantDetailPage({ id, navigate }) {
                     {plant.location && (
                       <div className="plant-detail-item">
                         <span className="plant-detail-label">� Location:</span>
-                        <span className="plant-detail-value">{plant.location}</span>
+                        <span className="plant-detail-value clickable-link" onClick={() => navigate(`/locations/${plant.locationId}`)}>{plant.location}</span>
                       </div>
                     )}
                     <div className="plant-detail-item">

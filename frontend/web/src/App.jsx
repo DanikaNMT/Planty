@@ -8,6 +8,9 @@ import { AuthPage } from './pages/AuthPage.jsx';
 import { SpeciesPage } from './pages/SpeciesPage.jsx';
 import { NewSpeciesPage } from './pages/NewSpeciesPage.jsx';
 import { SpeciesDetailPage } from './pages/SpeciesDetailPage.jsx';
+import { LocationsPage } from './pages/LocationsPage.jsx';
+import { NewLocationPage } from './pages/NewLocationPage.jsx';
+import { LocationDetailPage } from './pages/LocationDetailPage.jsx';
 
 export default function App() {
   const { route, navigate } = useRouter();
@@ -46,6 +49,12 @@ export default function App() {
       page = <NewSpeciesPage navigate={navigate} />; break;
     case 'species-detail':
       page = <SpeciesDetailPage id={route.id} navigate={navigate} />; break;
+    case 'locations':
+      page = <LocationsPage navigate={navigate} />; break;
+    case 'locations-new':
+      page = <NewLocationPage navigate={navigate} />; break;
+    case 'location-detail':
+      page = <LocationDetailPage id={route.id} navigate={navigate} />; break;
     default:
       page = (
         <div className="empty-state">
@@ -70,6 +79,9 @@ export default function App() {
           </button>
           <button onClick={() => navigate('/species')} className="btn-outline btn-small">
             🌺 Species
+          </button>
+          <button onClick={() => navigate('/locations')} className="btn-outline btn-small">
+            📍 Locations
           </button>
           <button onClick={() => navigate('/todos')} className="btn-outline btn-small">
             ✅ Todos

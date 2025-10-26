@@ -6,10 +6,14 @@ export function parsePath(pathname) {
   if (pathname === '/todos') return { name: 'todos' };
   if (pathname === '/species') return { name: 'species' };
   if (pathname === '/species/new') return { name: 'species-new' };
+  if (pathname === '/locations') return { name: 'locations' };
+  if (pathname === '/locations/new') return { name: 'locations-new' };
   const plantMatch = pathname.match(/^\/plant\/(.+)$/);
   if (plantMatch) return { name: 'plant', id: plantMatch[1] };
   const speciesMatch = pathname.match(/^\/species\/(.+)$/);
   if (speciesMatch) return { name: 'species-detail', id: speciesMatch[1] };
+  const locationMatch = pathname.match(/^\/locations\/(.+)$/);
+  if (locationMatch) return { name: 'location-detail', id: locationMatch[1] };
   return { name: 'not-found' };
 }
 
