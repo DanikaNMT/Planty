@@ -22,11 +22,16 @@ public class GetPlantsQueryHandler : IRequestHandler<GetPlantsQuery, IEnumerable
 
     private static PlantResponse MapToResponse(Plant plant)
     {
+        var lastWatered = plant.Waterings.OrderByDescending(w => w.WateredAt).FirstOrDefault()?.WateredAt;
+        
         DateTime? nextWateringDue = null;
-        if (plant.WateringIntervalDays.HasValue)
+        if (plant.WateringIntervalDays.HasValue && lastWatered.HasValue)
         {
-            nextWateringDue = plant.LastWatered?.AddDays(plant.WateringIntervalDays.Value) ?? 
-                             plant.DateAdded.AddDays(plant.WateringIntervalDays.Value);
+            nextWateringDue = lastWatered.Value.AddDays(plant.WateringIntervalDays.Value);
+        }
+        else if (plant.WateringIntervalDays.HasValue)
+        {
+            nextWateringDue = plant.DateAdded.AddDays(plant.WateringIntervalDays.Value);
         }
 
         return new PlantResponse(
@@ -35,7 +40,7 @@ public class GetPlantsQueryHandler : IRequestHandler<GetPlantsQuery, IEnumerable
             plant.Species,
             plant.Description,
             plant.DateAdded,
-            plant.LastWatered,
+            lastWatered,
             plant.WateringIntervalDays,
             plant.Location?.Name,
             plant.ImageUrl,

@@ -7,7 +7,6 @@ public class Plant
     public string? Species { get; set; }
     public string? Description { get; set; }
     public DateTime DateAdded { get; set; } = DateTime.UtcNow;
-    public DateTime? LastWatered { get; set; }
     public int? WateringIntervalDays { get; set; }
     public string? ImageUrl { get; set; }
 
@@ -18,4 +17,7 @@ public class Plant
     // Location relationship
     public Guid? LocationId { get; set; }
     public Location? Location { get; set; }
+
+    // Watering history
+    public ICollection<Watering> Waterings { get; set; } = new List<Watering>();
 }

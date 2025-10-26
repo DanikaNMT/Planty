@@ -11,6 +11,7 @@ public class PlantDbContext : DbContext
     public DbSet<Plant> Plants { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Location> Locations { get; set; } = null!;
+    public DbSet<Watering> Waterings { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -35,6 +36,19 @@ public class PlantDbContext : DbContext
                   .WithMany(l => l.Plants)
                   .HasForeignKey(e => e.LocationId)
                   .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasMany(e => e.Waterings)
+                  .WithOne(w => w.Plant)
+                  .HasForeignKey(w => w.PlantId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Watering>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.WateredAt).IsRequired();
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.HasIndex(e => new { e.PlantId, e.WateredAt });
         });
 
         modelBuilder.Entity<User>(entity =>

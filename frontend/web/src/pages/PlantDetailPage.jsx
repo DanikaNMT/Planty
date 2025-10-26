@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPlant, waterPlant } from '../api/plants.js';
+import { getPlant, waterPlant, getPlantWaterings } from '../api/plants.js';
 import { Loading } from '../components/Loading.jsx';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
 import { formatDate } from '../utils/formatDate.js';
@@ -7,7 +7,9 @@ import Link from '../components/Link.jsx';
 
 export function PlantDetailPage({ id, navigate }) {
   const [plant, setPlant] = useState(null);
+  const [waterings, setWaterings] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [loadingWaterings, setLoadingWaterings] = useState(false);
   const [error, setError] = useState(null);
   const [watering, setWatering] = useState(false);
   const [waterSuccess, setWaterSuccess] = useState(false);
@@ -19,6 +21,13 @@ export function PlantDetailPage({ id, navigate }) {
       .then(setPlant)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
+    
+    // Load watering history
+    setLoadingWaterings(true);
+    getPlantWaterings(id)
+      .then(setWaterings)
+      .catch(e => console.error('Failed to load watering history:', e.message))
+      .finally(() => setLoadingWaterings(false));
   }, [id]);
 
   const handleWaterPlant = async () => {
@@ -32,6 +41,9 @@ export function PlantDetailPage({ id, navigate }) {
       const updatedPlant = await waterPlant(id);
       setPlant(updatedPlant);
       setWaterSuccess(true);
+      // Reload watering history
+      const updatedWaterings = await getPlantWaterings(id);
+      setWaterings(updatedWaterings);
       // Clear success message after 3 seconds
       setTimeout(() => setWaterSuccess(false), 3000);
     } catch (e) {
@@ -105,6 +117,31 @@ export function PlantDetailPage({ id, navigate }) {
             >
               {watering ? 'Watering...' : '💧 Water Plant'}
             </button>
+          </div>
+
+          {/* Watering History */}
+          <div style={{ marginTop: '30px' }}>
+            <h3>Watering History</h3>
+            {loadingWaterings && <p>Loading history...</p>}
+            {waterings.length === 0 && !loadingWaterings && (
+              <p>No watering history yet. Water your plant to start tracking!</p>
+            )}
+            {waterings.length > 0 && (
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                {waterings.map(w => (
+                  <li key={w.id} style={{ marginBottom: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    <div>
+                      <strong>💧 Watered:</strong> {formatDate(w.wateredAt)}
+                    </div>
+                    {w.notes && (
+                      <div style={{ marginTop: '5px', fontStyle: 'italic' }}>
+                        Note: {w.notes}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       )}

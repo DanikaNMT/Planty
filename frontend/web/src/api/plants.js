@@ -26,3 +26,7 @@ export function waterPlant(id) {
     method: 'POST'
   });
 }
+
+export function getPlantWaterings(id) {
+  return apiFetch(`/api/plants/${id}/waterings`);
+}

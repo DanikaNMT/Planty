@@ -11,10 +11,12 @@ namespace Planty.Application.Commands.WaterPlant
     public class WaterPlantCommandHandler : IRequestHandler<WaterPlantCommand, PlantResponse>
     {
         private readonly IPlantRepository _plantRepository;
+        private readonly IWateringRepository _wateringRepository;
 
-        public WaterPlantCommandHandler(IPlantRepository plantRepository)
+        public WaterPlantCommandHandler(IPlantRepository plantRepository, IWateringRepository wateringRepository)
         {
             _plantRepository = plantRepository;
+            _wateringRepository = wateringRepository;
         }
 
         public async Task<PlantResponse> Handle(WaterPlantCommand request, CancellationToken cancellationToken)
@@ -24,15 +26,21 @@ namespace Planty.Application.Commands.WaterPlant
             if (plant == null || plant.UserId != request.UserId)
                 throw new Exception($"Plant with id {request.PlantId} not found for this user");
 
-            plant.LastWatered = DateTime.UtcNow;
-            await _plantRepository.UpdateAsync(plant, cancellationToken);
-            await _plantRepository.SaveChangesAsync(cancellationToken);
+            // Create a new watering record
+            var watering = new Watering
+            {
+                PlantId = plant.Id,
+                WateredAt = DateTime.UtcNow
+            };
 
+            await _wateringRepository.AddAsync(watering, cancellationToken);
+            await _wateringRepository.SaveChangesAsync(cancellationToken);
+
+            // Calculate next watering due
             DateTime? nextWateringDue = null;
             if (plant.WateringIntervalDays.HasValue)
             {
-                nextWateringDue = plant.LastWatered?.AddDays(plant.WateringIntervalDays.Value) ?? 
-                                 plant.DateAdded.AddDays(plant.WateringIntervalDays.Value);
+                nextWateringDue = watering.WateredAt.AddDays(plant.WateringIntervalDays.Value);
             }
 
             return new PlantResponse(
@@ -41,7 +49,7 @@ namespace Planty.Application.Commands.WaterPlant
                 plant.Species,
                 plant.Description,
                 plant.DateAdded,
-                plant.LastWatered,
+                watering.WateredAt,  // Use the new watering record's timestamp
                 plant.WateringIntervalDays,
                 plant.Location?.Name,
                 plant.ImageUrl,

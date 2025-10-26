@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Planty.Application.Commands.CreatePlant;
 using Planty.Application.Queries.GetPlantById;
 using Planty.Application.Queries.GetPlants;
+using Planty.Application.Queries.GetPlantWaterings;
 using Planty.Application.Commands.WaterPlant;
 using Planty.Contracts.Plants;
 
@@ -75,5 +76,15 @@ public class PlantsController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
+    }
+
+    [HttpGet("{id:guid}/waterings")]
+    public async Task<ActionResult<IEnumerable<WateringResponse>>> GetPlantWaterings(Guid id, CancellationToken cancellationToken)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+        var query = new GetPlantWateringsQuery(id, Guid.Parse(userId));
+        var result = await _mediator.Send(query, cancellationToken);
+        return Ok(result);
     }
 }
