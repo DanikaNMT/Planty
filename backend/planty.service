@@ -1,12 +1,14 @@
 [Unit]
-Description=Plant App Backend
+Description=Planty API Service
 After=network.target
 
 [Service]
 Type=notify
-User=pi
-WorkingDirectory=/home/pi/planty
-ExecStart=/home/pi/planty/Planty.API
+TimeoutStartSec=180
+User=planty
+Group=planty
+WorkingDirectory=/opt/planty-api
+ExecStart=/opt/planty-api/Planty.API
 Restart=always
 RestartSec=10
 Environment=ASPNETCORE_ENVIRONMENT=Production

@@ -17,6 +17,13 @@ if (Test-Path $OutputPath) {
 }
 New-Item -ItemType Directory -Path $OutputPath -Force | Out-Null
 
+# Navigate to backend folder
+Set-Location "C:\Users\arnod\repos\Planty\backend"
+
+# Clean all projects first
+Write-Host "Cleaning solution..." -ForegroundColor Yellow
+dotnet clean --configuration Release
+
 # Navigate to project
 Set-Location $ProjectPath
 

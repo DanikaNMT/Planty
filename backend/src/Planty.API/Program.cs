@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +8,9 @@ using Planty.Infrastructure.Data;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add systemd integration for Linux service hosting
+builder.Host.UseSystemd();
 
 // Add services to the container.
 builder.Services.AddControllers();

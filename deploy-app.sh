@@ -62,19 +62,18 @@ systemctl enable $SERVICE_NAME
 
 # Verify service is running
 echo "Verifying deployment..."
-sleep 5
+sleep 10
 if systemctl is-active --quiet $SERVICE_NAME; then
     echo "Deployment successful! Service is running."
     # Clean up old backup if deployment successful
     rm -rf $BACKUP_DIR || true
 else
-    echo "Deployment failed! Service is not running."
-    echo "Restoring backup..."
-    systemctl stop $SERVICE_NAME || true
-    rm -rf $APP_DIR || true
-    cp -r $BACKUP_DIR $APP_DIR || true
-    chown -R planty:planty $APP_DIR || true
-    chmod +x $APP_DIR/Planty.API || true
-    systemctl start $SERVICE_NAME || true
-    exit 1
+    echo "WARNING: Deployment completed but service is not running."
+    echo "Check logs with: journalctl -u $SERVICE_NAME -n 50"
+    echo "Backup available at: $BACKUP_DIR"
+    echo "NOT rolling back automatically - investigate the issue first."
+    # Don't rollback automatically during troubleshooting
+    # exit 1
 fi
+
+echo "Done!"
