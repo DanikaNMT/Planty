@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPlant, getLocations } from '../api/plants.js';
 import { getSpecies } from '../api/species.js';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
+import { SpeciesAutocomplete } from '../components/SpeciesAutocomplete.jsx';
 
 export function NewPlantPage({ navigate }) {
   const [data, setData] = useState({ name: '', speciesId: '', description: '', locationId: '' });
@@ -52,26 +53,12 @@ export function NewPlantPage({ navigate }) {
             />
           </div>
           
-          <div className="form-group">
-            <label>🌺 Species</label>
-            <select 
-              value={data.speciesId} 
-              onChange={e => setData({ ...data, speciesId: e.target.value })}
-            >
-              <option value="">No species (no care schedule)</option>
-              {species.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                  {(s.wateringIntervalDays || s.fertilizationIntervalDays) && 
-                    ` (💧 ${s.wateringIntervalDays || '—'} days, 🌿 ${s.fertilizationIntervalDays || '—'} days)`
-                  }
-                </option>
-              ))}
-            </select>
-            <small style={{ color: 'var(--color-text-light)', display: 'block', marginTop: 'var(--spacing-xs)' }}>
-              Species defines watering and fertilization schedule. <a onClick={() => navigate('/species/new')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Create new species</a>
-            </small>
-          </div>
+          <SpeciesAutocomplete 
+            species={species}
+            value={data.speciesId}
+            onChange={(speciesId) => setData({ ...data, speciesId })}
+            onSpeciesCreated={(newSpecies) => setSpecies([...species, newSpecies])}
+          />
           
           <div className="form-group">
             <label>📝 Description</label>

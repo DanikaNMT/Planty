@@ -3,6 +3,7 @@ import { getPlant, waterPlant, fertilizePlant, getPlantCareHistory, uploadPlantP
 import { getSpecies } from '../api/species.js';
 import { Loading } from '../components/Loading.jsx';
 import { ErrorMessage } from '../components/ErrorMessage.jsx';
+import { SpeciesAutocomplete } from '../components/SpeciesAutocomplete.jsx';
 import { formatDate } from '../utils/formatDate.js';
 import Link from '../components/Link.jsx';
 
@@ -319,24 +320,6 @@ export function PlantDetailPage({ id, navigate }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
                   <div>
                     <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
-                      Species
-                    </label>
-                    <input
-                      type="text"
-                      value={editForm.species}
-                      onChange={(e) => handleFormChange('species', e.target.value)}
-                      placeholder="e.g., Monstera deliciosa"
-                      style={{
-                        width: '100%',
-                        padding: 'var(--spacing-sm) var(--spacing-md)',
-                        border: '2px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: '1rem',
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
                       Description
                     </label>
                     <textarea
@@ -354,32 +337,15 @@ export function PlantDetailPage({ id, navigate }) {
                       }}
                     />
                   </div>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
-                      Species
-                    </label>
-                    <select
-                      value={editForm.speciesId}
-                      onChange={(e) => handleFormChange('speciesId', e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: 'var(--spacing-sm) var(--spacing-md)',
-                        border: '2px solid var(--color-border)',
-                        borderRadius: 'var(--radius-md)',
-                        fontSize: '1rem',
-                      }}
-                    >
-                      <option value="">No species (no care schedule)</option>
-                      {species.map(s => (
-                        <option key={s.id} value={s.id}>
-                          {s.name}
-                          {(s.wateringIntervalDays || s.fertilizationIntervalDays) && 
-                            ` (💧 ${s.wateringIntervalDays || '—'} days, 🌿 ${s.fertilizationIntervalDays || '—'} days)`
-                          }
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <SpeciesAutocomplete 
+                    species={species}
+                    value={editForm.speciesId}
+                    onChange={(speciesId) => handleFormChange('speciesId', speciesId)}
+                    onSpeciesCreated={(newSpecies) => {
+                      setSpecies([...species, newSpecies]);
+                      handleFormChange('speciesId', newSpecies.id);
+                    }}
+                  />
                   <div>
                     <label style={{ display: 'block', marginBottom: 'var(--spacing-xs)', fontWeight: '600', color: 'var(--color-text)' }}>
                       Location
