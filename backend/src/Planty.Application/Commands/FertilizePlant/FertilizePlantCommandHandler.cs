@@ -30,7 +30,8 @@ namespace Planty.Application.Commands.FertilizePlant
             var fertilization = new Fertilization
             {
                 PlantId = plant.Id,
-                FertilizedAt = DateTime.UtcNow
+                FertilizedAt = DateTime.UtcNow,
+                UserId = request.UserId
             };
 
             await _fertilizationRepository.AddAsync(fertilization, cancellationToken);

@@ -4,5 +4,7 @@ public record PlantPictureResponse(
     Guid Id,
     DateTime TakenAt,
     string Url,
-    string? Notes
+    string? Notes,
+    Guid UserId,
+    string UserName
 );

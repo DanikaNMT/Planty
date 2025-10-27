@@ -17,6 +17,7 @@ public class WateringRepository : IWateringRepository
     public async Task<IEnumerable<Watering>> GetByPlantIdAsync(Guid plantId, CancellationToken cancellationToken = default)
     {
         return await _context.Waterings
+            .Include(w => w.User)
             .Where(w => w.PlantId == plantId)
             .OrderByDescending(w => w.WateredAt)
             .ToListAsync(cancellationToken);

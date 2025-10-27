@@ -15,4 +15,9 @@ public class User
     
     // Shares received by this user
     public ICollection<Share> SharesReceived { get; set; } = new List<Share>();
+
+    // Actions performed by this user
+    public ICollection<Watering> Waterings { get; set; } = new List<Watering>();
+    public ICollection<Fertilization> Fertilizations { get; set; } = new List<Fertilization>();
+    public ICollection<PlantPicture> Pictures { get; set; } = new List<PlantPicture>();
 }

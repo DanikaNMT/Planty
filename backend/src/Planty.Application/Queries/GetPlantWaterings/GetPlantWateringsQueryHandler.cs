@@ -32,7 +32,9 @@ public class GetPlantWateringsQueryHandler : IRequestHandler<GetPlantWateringsQu
         return new WateringResponse(
             watering.Id,
             watering.WateredAt,
-            watering.Notes
+            watering.Notes,
+            watering.UserId,
+            watering.User?.UserName ?? "Unknown"
         );
     }
 }

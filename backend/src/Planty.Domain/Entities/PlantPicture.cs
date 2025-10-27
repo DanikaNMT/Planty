@@ -10,4 +10,8 @@ public class PlantPicture
     // Plant relationship
     public Guid PlantId { get; set; }
     public Plant Plant { get; set; } = null!;
+
+    // User who uploaded the picture
+    public Guid UserId { get; set; }
+    public User User { get; set; } = null!;
 }

@@ -17,6 +17,7 @@ public class PlantPictureRepository : IPlantPictureRepository
     public async Task<IEnumerable<PlantPicture>> GetByPlantIdAsync(Guid plantId, CancellationToken cancellationToken = default)
     {
         return await _context.PlantPictures
+            .Include(p => p.User)
             .Where(p => p.PlantId == plantId)
             .OrderByDescending(p => p.TakenAt)
             .ToListAsync(cancellationToken);
@@ -25,6 +26,7 @@ public class PlantPictureRepository : IPlantPictureRepository
     public async Task<PlantPicture?> GetLatestByPlantIdAsync(Guid plantId, CancellationToken cancellationToken = default)
     {
         return await _context.PlantPictures
+            .Include(p => p.User)
             .Where(p => p.PlantId == plantId)
             .OrderByDescending(p => p.TakenAt)
             .FirstOrDefaultAsync(cancellationToken);
@@ -33,6 +35,7 @@ public class PlantPictureRepository : IPlantPictureRepository
     public async Task<PlantPicture?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.PlantPictures
+            .Include(p => p.User)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 

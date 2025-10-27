@@ -17,6 +17,7 @@ public class FertilizationRepository : IFertilizationRepository
     public async Task<IEnumerable<Fertilization>> GetByPlantIdAsync(Guid plantId, CancellationToken cancellationToken = default)
     {
         return await _context.Fertilizations
+            .Include(f => f.User)
             .Where(f => f.PlantId == plantId)
             .OrderByDescending(f => f.FertilizedAt)
             .ToListAsync(cancellationToken);

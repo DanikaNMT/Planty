@@ -68,17 +68,23 @@ public class UploadPlantPictureCommandHandler : IRequestHandler<UploadPlantPictu
             PlantId = request.PlantId,
             FilePath = filePath,
             Notes = request.Notes,
-            TakenAt = DateTime.UtcNow
+            TakenAt = DateTime.UtcNow,
+            UserId = request.UserId
         };
 
         await _pictureRepository.AddAsync(picture, cancellationToken);
         await _pictureRepository.SaveChangesAsync(cancellationToken);
 
+        // Reload to get user information
+        var savedPicture = await _pictureRepository.GetByIdAsync(picture.Id, cancellationToken);
+
         return new PlantPictureResponse(
-            picture.Id,
-            picture.TakenAt,
-            $"/api/plants/pictures/{picture.Id}",
-            picture.Notes
+            savedPicture!.Id,
+            savedPicture.TakenAt,
+            $"/api/plants/pictures/{savedPicture.Id}",
+            savedPicture.Notes,
+            savedPicture.UserId,
+            savedPicture.User?.UserName ?? "Unknown"
         );
     }
 }

@@ -66,6 +66,11 @@ public class PlantDbContext : DbContext
             entity.Property(e => e.WateredAt).IsRequired();
             entity.Property(e => e.Notes).HasMaxLength(500);
             entity.HasIndex(e => new { e.PlantId, e.WateredAt });
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.Waterings)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Fertilization>(entity =>
@@ -74,6 +79,11 @@ public class PlantDbContext : DbContext
             entity.Property(e => e.FertilizedAt).IsRequired();
             entity.Property(e => e.Notes).HasMaxLength(500);
             entity.HasIndex(e => new { e.PlantId, e.FertilizedAt });
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.Fertilizations)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<PlantPicture>(entity =>
@@ -83,6 +93,11 @@ public class PlantDbContext : DbContext
             entity.Property(e => e.FilePath).IsRequired().HasMaxLength(500);
             entity.Property(e => e.Notes).HasMaxLength(500);
             entity.HasIndex(e => new { e.PlantId, e.TakenAt });
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.Pictures)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<User>(entity =>

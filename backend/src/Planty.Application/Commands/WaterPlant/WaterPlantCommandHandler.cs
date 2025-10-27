@@ -31,7 +31,8 @@ namespace Planty.Application.Commands.WaterPlant
             var watering = new Watering
             {
                 PlantId = plant.Id,
-                WateredAt = DateTime.UtcNow
+                WateredAt = DateTime.UtcNow,
+                UserId = request.UserId
             };
 
             await _wateringRepository.AddAsync(watering, cancellationToken);

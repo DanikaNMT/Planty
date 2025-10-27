@@ -5,5 +5,7 @@ public record CareEventResponse(
     string Type, // "Watering", "Fertilization", or "Picture"
     DateTime Timestamp,
     string? Notes,
-    string? ImageUrl = null // Only populated for Picture type
+    string? ImageUrl, // Only populated for Picture type
+    Guid UserId,
+    string UserName
 );

@@ -32,7 +32,9 @@ public class GetPlantFertilizationsQueryHandler : IRequestHandler<GetPlantFertil
         return new FertilizationResponse(
             fertilization.Id,
             fertilization.FertilizedAt,
-            fertilization.Notes
+            fertilization.Notes,
+            fertilization.UserId,
+            fertilization.User?.UserName ?? "Unknown"
         );
     }
 }

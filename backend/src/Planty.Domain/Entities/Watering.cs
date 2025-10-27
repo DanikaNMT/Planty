@@ -9,4 +9,8 @@ public class Watering
     // Plant relationship
     public Guid PlantId { get; set; }
     public Plant Plant { get; set; } = null!;
+
+    // User who performed the watering
+    public Guid UserId { get; set; }
+    public User User { get; set; } = null!;
 }

@@ -549,8 +549,10 @@ export function PlantDetailPage({ id, navigate }) {
                         {event.type === 'Picture' && '📸'}
                       </span>
                       <strong>{event.type}</strong>
-                      <span style={{ marginLeft: 'auto', color: 'var(--color-text-light)' }}>
-                        {formatDate(event.timestamp)}
+                      <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', color: 'var(--color-text-light)' }}>
+                        <span>👤 {event.userName}</span>
+                        <span>•</span>
+                        <span>{formatDate(event.timestamp)}</span>
                       </span>
                     </div>
                     {event.imageUrl && (
