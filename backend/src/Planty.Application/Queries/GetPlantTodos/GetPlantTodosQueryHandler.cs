@@ -7,19 +7,44 @@ using Planty.Domain.Repositories;
 public class GetPlantTodosQueryHandler : IRequestHandler<GetPlantTodosQuery, IEnumerable<PlantTodoResponse>>
 {
     private readonly IPlantRepository _plantRepository;
+    private readonly IShareRepository _shareRepository;
 
-    public GetPlantTodosQueryHandler(IPlantRepository plantRepository)
+    public GetPlantTodosQueryHandler(IPlantRepository plantRepository, IShareRepository shareRepository)
     {
         _plantRepository = plantRepository;
+        _shareRepository = shareRepository;
     }
 
     public async Task<IEnumerable<PlantTodoResponse>> Handle(GetPlantTodosQuery request, CancellationToken cancellationToken)
     {
-        var plants = await _plantRepository.GetAllByUserAsync(request.UserId, cancellationToken);
+        // Get owned plants
+        var ownedPlants = await _plantRepository.GetAllByUserAsync(request.UserId, cancellationToken);
+        
+        // Get shared plant IDs
+        var sharedPlantIds = await _shareRepository.GetSharedPlantIdsForUserAsync(request.UserId, cancellationToken);
+        
+        // Get shared plants
+        var sharedPlants = new List<Domain.Entities.Plant>();
+        foreach (var plantId in sharedPlantIds)
+        {
+            // Skip if already in owned plants
+            if (ownedPlants.Any(p => p.Id == plantId))
+                continue;
+                
+            var plant = await _plantRepository.GetByIdAsync(plantId, cancellationToken);
+            if (plant != null)
+            {
+                sharedPlants.Add(plant);
+            }
+        }
+        
+        // Combine all plants
+        var allPlants = ownedPlants.Concat(sharedPlants);
+        
         var cutoffDate = DateTime.UtcNow.AddHours(request.HoursAhead);
         var todos = new List<PlantTodoResponse>();
 
-        foreach (var plant in plants)
+        foreach (var plant in allPlants)
         {
             // Skip plants without species (no care intervals defined)
             if (plant.Species == null)
