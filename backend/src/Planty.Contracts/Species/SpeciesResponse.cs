@@ -6,5 +6,8 @@ public record SpeciesResponse(
     string? Description,
     int? WateringIntervalDays,
     int? FertilizationIntervalDays,
-    int PlantCount
+    int PlantCount,
+    bool IsShared,
+    Guid? OwnerId,
+    string? OwnerName
 );

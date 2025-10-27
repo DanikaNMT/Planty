@@ -126,13 +126,31 @@ export function SpeciesDetailPage({ id, navigate }) {
         {!isEditing ? (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--spacing-lg)' }}>
-              <h2 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
+              <h2 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', flexWrap: 'wrap' }}>
                 <span>🌺</span>
                 {species.name}
+                {species.isShared && (
+                  <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '0.25rem', 
+                    padding: '0.25rem 0.5rem',
+                    backgroundColor: 'var(--color-primary-light)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    color: 'var(--color-primary-dark)'
+                  }}>
+                    <span>👥</span>
+                    <span>Shared by {species.ownerName}</span>
+                  </span>
+                )}
               </h2>
-              <button onClick={() => setIsEditing(true)} className="btn-outline">
-                📝 Edit
-              </button>
+              {!species.isShared && (
+                <button onClick={() => setIsEditing(true)} className="btn-outline">
+                  📝 Edit
+                </button>
+              )}
             </div>
             
             {species.description && (

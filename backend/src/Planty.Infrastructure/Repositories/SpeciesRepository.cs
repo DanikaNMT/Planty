@@ -18,6 +18,7 @@ public class SpeciesRepository : ISpeciesRepository
     {
         return await _context.Species
             .Include(s => s.Plants)
+            .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
     }
 
@@ -25,6 +26,7 @@ public class SpeciesRepository : ISpeciesRepository
     {
         return await _context.Species
             .Include(s => s.Plants)
+            .Include(s => s.User)
             .Where(s => s.UserId == userId)
             .OrderBy(s => s.Name)
             .ToListAsync(cancellationToken);
@@ -34,6 +36,7 @@ public class SpeciesRepository : ISpeciesRepository
     {
         return await _context.Species
             .Include(s => s.Plants)
+            .Include(s => s.User)
             .Where(s => s.Plants.Any(p => plantIds.Contains(p.Id)))
             .Distinct()
             .OrderBy(s => s.Name)

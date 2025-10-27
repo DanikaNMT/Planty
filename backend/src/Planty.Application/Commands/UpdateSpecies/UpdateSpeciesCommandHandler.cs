@@ -43,7 +43,10 @@ public class UpdateSpeciesCommandHandler : IRequestHandler<UpdateSpeciesCommand,
             updatedSpecies.Description,
             updatedSpecies.WateringIntervalDays,
             updatedSpecies.FertilizationIntervalDays,
-            updatedSpecies.Plants.Count
+            updatedSpecies.Plants.Count,
+            false, // Not shared - user owns it
+            null,  // No owner ID for owned species
+            null   // No owner name for owned species
         );
     }
 }

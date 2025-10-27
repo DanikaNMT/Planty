@@ -40,13 +40,19 @@ public class GetSpeciesQueryHandler : IRequestHandler<GetSpeciesQuery, IEnumerab
         // Combine and deduplicate by ID
         var allSpecies = ownedSpecies.Concat(sharedSpecies).DistinctBy(s => s.Id);
         
-        return allSpecies.Select(s => new SpeciesResponse(
-            s.Id,
-            s.Name,
-            s.Description,
-            s.WateringIntervalDays,
-            s.FertilizationIntervalDays,
-            s.Plants.Count
-        )).ToList();
+        return allSpecies.Select(s => {
+            bool isShared = s.UserId != request.UserId;
+            return new SpeciesResponse(
+                s.Id,
+                s.Name,
+                s.Description,
+                s.WateringIntervalDays,
+                s.FertilizationIntervalDays,
+                s.Plants.Count,
+                isShared,
+                isShared ? s.UserId : null,
+                isShared ? s.User?.UserName : null
+            );
+        }).ToList();
     }
 }

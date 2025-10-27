@@ -33,7 +33,10 @@ public class CreateSpeciesCommandHandler : IRequestHandler<CreateSpeciesCommand,
             createdSpecies.Description,
             createdSpecies.WateringIntervalDays,
             createdSpecies.FertilizationIntervalDays,
-            0 // No plants yet
+            0, // No plants yet
+            false, // Not shared - user just created it
+            null, // No owner ID for owned species
+            null  // No owner name for owned species
         );
     }
 }

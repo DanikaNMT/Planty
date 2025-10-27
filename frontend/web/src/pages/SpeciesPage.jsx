@@ -89,8 +89,24 @@ export function SpeciesPage({ navigate }) {
                 style={{ flex: 1, cursor: 'pointer' }}
                 onClick={() => navigate(`/species/${s.id}`)}
               >
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: 'var(--spacing-sm)' }}>
+                <h3 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: 'var(--spacing-sm)', display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
                   {s.name}
+                  {s.isShared && (
+                    <span style={{ 
+                      display: 'inline-flex', 
+                      alignItems: 'center', 
+                      gap: '0.25rem', 
+                      padding: '0.25rem 0.5rem',
+                      backgroundColor: 'var(--color-primary-light)',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.75rem',
+                      fontWeight: '500',
+                      color: 'var(--color-primary-dark)'
+                    }}>
+                      <span>👥</span>
+                      <span>Shared by {s.ownerName}</span>
+                    </span>
+                  )}
                 </h3>
                 {s.description && (
                   <p style={{ color: 'var(--color-text-light)', marginBottom: 'var(--spacing-md)' }}>
@@ -112,19 +128,21 @@ export function SpeciesPage({ navigate }) {
                   onClick={() => navigate(`/species/${s.id}`)}
                   className="btn-outline btn-small"
                 >
-                  📝 Edit
+                  {s.isShared ? '�️ View' : '�📝 Edit'}
                 </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(s.id, s.name);
-                  }}
-                  disabled={deletingId === s.id}
-                  className="btn-outline btn-small"
-                  style={{ color: 'var(--color-danger)' }}
-                >
-                  {deletingId === s.id ? '⏳' : '🗑️'} Delete
-                </button>
+                {!s.isShared && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(s.id, s.name);
+                    }}
+                    disabled={deletingId === s.id}
+                    className="btn-outline btn-small"
+                    style={{ color: 'var(--color-danger)' }}
+                  >
+                    {deletingId === s.id ? '⏳' : '🗑️'} Delete
+                  </button>
+                )}
               </div>
             </div>
           </div>
