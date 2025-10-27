@@ -3,6 +3,7 @@ namespace Planty.Application.Common;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Planty.Application.Interfaces;
 using Planty.Domain.Entities;
 using Planty.Domain.Repositories;
 
@@ -12,20 +13,26 @@ using Planty.Domain.Repositories;
 public abstract class CareActionHandler<TCareAction> where TCareAction : class
 {
     private readonly IPlantRepository _plantRepository;
+    private readonly IPermissionService _permissionService;
 
-    protected CareActionHandler(IPlantRepository plantRepository)
+    protected CareActionHandler(IPlantRepository plantRepository, IPermissionService permissionService)
     {
         _plantRepository = plantRepository;
+        _permissionService = permissionService;
     }
 
     /// <summary>
-    /// Validates that the plant exists and belongs to the user
+    /// Validates that the plant exists and user has permission to perform care actions
     /// </summary>
-    protected async Task<Plant> ValidatePlantOwnershipAsync(Guid plantId, Guid userId, CancellationToken cancellationToken)
+    protected async Task<Plant> ValidatePlantCarePermissionAsync(Guid plantId, Guid userId, CancellationToken cancellationToken)
     {
         var plant = await _plantRepository.GetByIdAsync(plantId, cancellationToken);
-        if (plant == null || plant.UserId != userId)
-            throw new Exception($"Plant with id {plantId} not found for this user");
+        if (plant == null)
+            throw new InvalidOperationException($"Plant with id {plantId} not found");
+        
+        if (!await _permissionService.CanUserCarePlantAsync(plantId, userId, cancellationToken))
+            throw new UnauthorizedAccessException("You don't have permission to perform care actions on this plant.");
+        
         return plant;
     }
 

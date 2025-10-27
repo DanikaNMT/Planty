@@ -2,6 +2,7 @@ namespace Planty.Application.Tests.Features.Plants.Commands;
 
 using FluentAssertions;
 using Planty.Application.Commands.WaterPlant;
+using Planty.Application.Interfaces;
 using Planty.Domain.Entities;
 using Planty.Domain.Repositories;
 using Moq;
@@ -11,6 +12,7 @@ public class WaterPlantCommandHandlerTests
 {
     private readonly Mock<IPlantRepository> _plantRepository;
     private readonly Mock<IWateringRepository> _wateringRepository;
+    private readonly Mock<IPermissionService> _permissionService;
     private readonly WaterPlantCommandHandler _handler;
     private readonly Guid _userId;
 
@@ -18,7 +20,8 @@ public class WaterPlantCommandHandlerTests
     {
         _plantRepository = new Mock<IPlantRepository>();
         _wateringRepository = new Mock<IWateringRepository>();
-        _handler = new WaterPlantCommandHandler(_plantRepository.Object, _wateringRepository.Object);
+        _permissionService = new Mock<IPermissionService>();
+        _handler = new WaterPlantCommandHandler(_plantRepository.Object, _wateringRepository.Object, _permissionService.Object);
         _userId = Guid.NewGuid();
     }
 
@@ -37,6 +40,9 @@ public class WaterPlantCommandHandlerTests
         var request = new WaterPlantCommand(plantId, _userId);
         _plantRepository.Setup(r => r.GetByIdAsync(plantId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(plant);
+        
+        _permissionService.Setup(s => s.CanUserCarePlantAsync(plantId, _userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
         
         Watering? capturedWatering = null;
         _wateringRepository.Setup(r => r.AddAsync(It.IsAny<Watering>(), It.IsAny<CancellationToken>()))
@@ -66,29 +72,31 @@ public class WaterPlantCommandHandlerTests
             .ReturnsAsync((Plant?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _handler.Handle(request, CancellationToken.None));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _handler.Handle(request, CancellationToken.None));
         _wateringRepository.Verify(r => r.AddAsync(It.IsAny<Watering>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task Handle_ShouldThrowException_WhenUserDoesNotOwnPlant()
+    public async Task Handle_ShouldThrowException_WhenUserDoesNotHavePermission()
     {
         // Arrange
         var plantId = Guid.NewGuid();
-        var otherUserId = Guid.NewGuid();
         var plant = new Plant
         {
             Id = plantId,
             Name = "Test Plant",
-            UserId = otherUserId
+            UserId = Guid.NewGuid() // Different user
         };
         
         var request = new WaterPlantCommand(plantId, _userId);
         _plantRepository.Setup(r => r.GetByIdAsync(plantId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(plant);
+        
+        _permissionService.Setup(s => s.CanUserCarePlantAsync(plantId, _userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _handler.Handle(request, CancellationToken.None));
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _handler.Handle(request, CancellationToken.None));
         _wateringRepository.Verify(r => r.AddAsync(It.IsAny<Watering>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -117,6 +125,9 @@ public class WaterPlantCommandHandlerTests
         var request = new WaterPlantCommand(plantId, _userId);
         _plantRepository.Setup(r => r.GetByIdAsync(plantId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(plant);
+        
+        _permissionService.Setup(s => s.CanUserCarePlantAsync(plantId, _userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
         
         _wateringRepository.Setup(r => r.AddAsync(It.IsAny<Watering>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((Watering w, CancellationToken _) => w);

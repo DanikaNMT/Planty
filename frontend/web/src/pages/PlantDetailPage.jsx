@@ -6,6 +6,13 @@ import { ErrorMessage } from '../components/ErrorMessage.jsx';
 import { formatDate } from '../utils/formatDate.js';
 import Link from '../components/Link.jsx';
 
+// Permission helper functions based on ShareRole
+// Viewer = 0, Carer = 1, Editor = 2, Owner = 3
+const canView = (plant) => !plant.isShared || plant.userRole !== null;
+const canCare = (plant) => !plant.isShared || (plant.userRole !== null && plant.userRole >= 1); // Carer or higher
+const canEdit = (plant) => !plant.isShared || (plant.userRole !== null && plant.userRole >= 2); // Editor or higher
+const canDelete = (plant) => !plant.isShared || (plant.userRole !== null && plant.userRole >= 3); // Owner only
+
 export function PlantDetailPage({ id, navigate }) {
   const [plant, setPlant] = useState(null);
   const [careHistory, setCareHistory] = useState([]);
@@ -274,9 +281,34 @@ export function PlantDetailPage({ id, navigate }) {
                     />
                   </div>
                 ) : (
-                  <h2 className="plant-detail-title">🪴 {plant.name}</h2>
+                  <div style={{ flex: 1 }}>
+                    <h2 className="plant-detail-title">🪴 {plant.name}</h2>
+                    {plant.isShared && (
+                      <div style={{ 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: 'var(--spacing-xs)', 
+                        padding: 'var(--spacing-xs) var(--spacing-sm)',
+                        backgroundColor: 'var(--color-primary-light)',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.875rem',
+                        fontWeight: '500',
+                        color: 'var(--color-primary-dark)',
+                        marginTop: 'var(--spacing-xs)'
+                      }}>
+                        <span>👥</span>
+                        <span>
+                          Shared by {plant.ownerName || 'another user'} · 
+                          {plant.userRole === 0 && ' Viewer'}
+                          {plant.userRole === 1 && ' Carer'}
+                          {plant.userRole === 2 && ' Editor'}
+                          {plant.userRole === 3 && ' Owner'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 )}
-                {!isEditing && (
+                {!isEditing && canEdit(plant) && (
                   <button onClick={handleEditClick} className="btn-outline btn-small">
                     ✏️ Edit
                   </button>
@@ -424,38 +456,44 @@ export function PlantDetailPage({ id, navigate }) {
                   </div>
                   
                   <div className="plant-actions">
-                <button
-                  onClick={handleWaterPlant}
-                  disabled={watering}
-                  className="btn-water btn-large"
-                >
-                  {watering ? '⏳ Watering...' : '💧 Water Plant'}
-                </button>
-                <button
-                  onClick={handleFertilizePlant}
-                  disabled={fertilizing}
-                  className="btn-fertilizer btn-large"
-                >
-                  {fertilizing ? '⏳ Fertilizing...' : '🌿 Fertilize Plant'}
-                </button>
-                <label style={{ display: 'inline-block' }}>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePictureUpload}
-                    disabled={uploading}
-                    style={{ display: 'none' }}
-                    id="picture-upload"
-                  />
+                {canCare(plant) && (
                   <button
-                    onClick={() => document.getElementById('picture-upload').click()}
-                    disabled={uploading}
-                    className="btn-picture btn-large"
-                    type="button"
+                    onClick={handleWaterPlant}
+                    disabled={watering}
+                    className="btn-water btn-large"
                   >
-                    {uploading ? '⏳ Uploading...' : '📸 Add Picture'}
+                    {watering ? '⏳ Watering...' : '💧 Water Plant'}
                   </button>
-                </label>
+                )}
+                {canCare(plant) && (
+                  <button
+                    onClick={handleFertilizePlant}
+                    disabled={fertilizing}
+                    className="btn-fertilizer btn-large"
+                  >
+                    {fertilizing ? '⏳ Fertilizing...' : '🌿 Fertilize Plant'}
+                  </button>
+                )}
+                {canCare(plant) && (
+                  <label style={{ display: 'inline-block' }}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePictureUpload}
+                      disabled={uploading}
+                      style={{ display: 'none' }}
+                      id="picture-upload"
+                    />
+                    <button
+                      onClick={() => document.getElementById('picture-upload').click()}
+                      disabled={uploading}
+                      className="btn-picture btn-large"
+                      type="button"
+                    >
+                      {uploading ? '⏳ Uploading...' : '📸 Add Picture'}
+                    </button>
+                  </label>
+                )}
               </div>
                 </>
               )}

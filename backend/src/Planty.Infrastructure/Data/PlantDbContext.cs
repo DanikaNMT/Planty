@@ -15,6 +15,7 @@ public class PlantDbContext : DbContext
     public DbSet<Watering> Waterings { get; set; } = null!;
     public DbSet<Fertilization> Fertilizations { get; set; } = null!;
     public DbSet<PlantPicture> PlantPictures { get; set; } = null!;
+    public DbSet<Share> Shares { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -117,6 +118,44 @@ public class PlantDbContext : DbContext
                   .WithMany(u => u.Species)
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Share>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ShareType).IsRequired();
+            entity.Property(e => e.Role).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+
+            // Owner relationship
+            entity.HasOne(e => e.Owner)
+                  .WithMany(u => u.SharesCreated)
+                  .HasForeignKey(e => e.OwnerId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // SharedWithUser relationship
+            entity.HasOne(e => e.SharedWithUser)
+                  .WithMany(u => u.SharesReceived)
+                  .HasForeignKey(e => e.SharedWithUserId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            // Plant relationship (optional)
+            entity.HasOne(e => e.Plant)
+                  .WithMany(p => p.Shares)
+                  .HasForeignKey(e => e.PlantId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // Location relationship (optional)
+            entity.HasOne(e => e.Location)
+                  .WithMany(l => l.Shares)
+                  .HasForeignKey(e => e.LocationId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes for efficient querying
+            entity.HasIndex(e => e.OwnerId);
+            entity.HasIndex(e => e.SharedWithUserId);
+            entity.HasIndex(e => e.PlantId);
+            entity.HasIndex(e => e.LocationId);
         });
     }
 }

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Planty.Application.Commands.UpdatePassword;
 using Planty.Application.Commands.UpdateUserProfile;
 using Planty.Application.Queries.GetUserProfile;
+using Planty.Application.Queries.SearchUsers;
+using Planty.Contracts.Shares;
 using Planty.Contracts.User;
 using System.Security.Claims;
 
@@ -86,5 +88,25 @@ public class UserController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
+    }
+
+    /// <summary>
+    /// Search for users by email or username (for sharing)
+    /// </summary>
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(IEnumerable<UserSearchResult>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<IEnumerable<UserSearchResult>>> SearchUsers(
+        [FromQuery] string q,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(q))
+        {
+            return Ok(Array.Empty<UserSearchResult>());
+        }
+
+        var query = new SearchUsersQuery(q);
+        var result = await _mediator.Send(query, cancellationToken);
+        return Ok(result);
     }
 }

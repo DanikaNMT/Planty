@@ -11,11 +11,19 @@ public class CreatePlantCommandHandler : IRequestHandler<CreatePlantCommand, Pla
 {
     private readonly IPlantRepository _plantRepository;
     private readonly ISpeciesRepository _speciesRepository;
+    private readonly ILocationRepository _locationRepository;
+    private readonly IPermissionService _permissionService;
 
-    public CreatePlantCommandHandler(IPlantRepository plantRepository, ISpeciesRepository speciesRepository)
+    public CreatePlantCommandHandler(
+        IPlantRepository plantRepository, 
+        ISpeciesRepository speciesRepository,
+        ILocationRepository locationRepository,
+        IPermissionService permissionService)
     {
         _plantRepository = plantRepository;
         _speciesRepository = speciesRepository;
+        _locationRepository = locationRepository;
+        _permissionService = permissionService;
     }
 
     public async Task<PlantResponse> Handle(CreatePlantCommand request, CancellationToken cancellationToken)
@@ -27,6 +35,22 @@ public class CreatePlantCommandHandler : IRequestHandler<CreatePlantCommand, Pla
             if (species == null || species.UserId != request.UserId)
             {
                 throw new InvalidOperationException("Species not found or does not belong to user");
+            }
+        }
+
+        // Validate location permission if provided
+        if (request.LocationId.HasValue)
+        {
+            var location = await _locationRepository.GetByIdAsync(request.LocationId.Value, cancellationToken);
+            if (location == null)
+            {
+                throw new InvalidOperationException("Location not found");
+            }
+
+            // Check if user has permission to add plants to this location (requires Editor or Owner role)
+            if (!await _permissionService.CanUserEditLocationAsync(request.LocationId.Value, request.UserId, cancellationToken))
+            {
+                throw new UnauthorizedAccessException("You don't have permission to add plants to this location.");
             }
         }
 

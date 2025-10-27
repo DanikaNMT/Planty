@@ -16,6 +16,10 @@ export function LocationDetailPage({ navigate, id }) {
   const [loadingPlants, setLoadingPlants] = useState(false);
   const [assigning, setAssigning] = useState(false);
 
+  // Permission helper functions
+  const canEdit = (loc) => !loc.isShared || (loc.userRole !== null && loc.userRole >= 2);
+  const canDelete = (loc) => !loc.isShared || (loc.userRole !== null && loc.userRole >= 3);
+
   useEffect(() => {
     loadLocation();
   }, [id]);
@@ -161,20 +165,45 @@ export function LocationDetailPage({ navigate, id }) {
                 Default
               </span>
             )}
+            {location.isShared && (
+              <span style={{ 
+                fontSize: '0.8rem', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '0.25rem', 
+                padding: '4px 12px',
+                backgroundColor: 'var(--color-primary-light)',
+                borderRadius: '4px',
+                color: 'var(--color-primary-dark)'
+              }}>
+                <span>👥</span>
+                <span>Shared by {location.ownerName} · </span>
+                <span>
+                  {location.userRole === 0 && 'Viewer'}
+                  {location.userRole === 1 && 'Carer'}
+                  {location.userRole === 2 && 'Editor'}
+                  {location.userRole === 3 && 'Owner'}
+                </span>
+              </span>
+            )}
           </h2>
           {!editing && !location.isDefault && (
             <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
-              <button onClick={handleEdit} className="btn-outline">
-                ✏️ Edit
-              </button>
-              <button 
-                onClick={handleDelete} 
-                className="btn-outline"
-                disabled={deleting}
-                style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
-              >
-                {deleting ? '⏳ Deleting...' : '🗑️ Delete'}
-              </button>
+              {canEdit(location) && (
+                <button onClick={handleEdit} className="btn-outline">
+                  ✏️ Edit
+                </button>
+              )}
+              {canDelete(location) && (
+                <button 
+                  onClick={handleDelete} 
+                  className="btn-outline"
+                  disabled={deleting}
+                  style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+                >
+                  {deleting ? '⏳ Deleting...' : '🗑️ Delete'}
+                </button>
+              )}
             </div>
           )}
         </div>

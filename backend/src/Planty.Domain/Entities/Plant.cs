@@ -28,4 +28,7 @@ public class Plant
     
     // Picture history
     public ICollection<PlantPicture> Pictures { get; set; } = new List<PlantPicture>();
+    
+    // Sharing
+    public ICollection<Share> Shares { get; set; } = new List<Share>();
 }

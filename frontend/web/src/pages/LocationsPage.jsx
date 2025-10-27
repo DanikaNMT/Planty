@@ -106,6 +106,26 @@ export function LocationsPage({ navigate }) {
                           Default
                         </span>
                       )}
+                      {location.isShared && (
+                        <span style={{ 
+                          fontSize: '0.8rem', 
+                          backgroundColor: 'var(--color-primary-light)',
+                          color: 'var(--color-primary-dark)',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <span>👥</span>
+                          <span>
+                            {location.userRole === 0 && 'Viewer'}
+                            {location.userRole === 1 && 'Carer'}
+                            {location.userRole === 2 && 'Editor'}
+                            {location.userRole === 3 && 'Owner'}
+                          </span>
+                        </span>
+                      )}
                     </h3>
                     {location.description && (
                       <p style={{ 

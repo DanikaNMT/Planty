@@ -1,5 +1,7 @@
 namespace Planty.Contracts.Plants;
 
+using Planty.Contracts.Shares;
+
 public record PlantResponse(
     Guid Id,
     string Name,
@@ -16,5 +18,9 @@ public record PlantResponse(
     DateTime? LastFertilized,
     int? FertilizationIntervalDays,
     DateTime? NextFertilizationDue,
-    string? LatestPictureUrl
+    string? LatestPictureUrl,
+    bool IsShared,
+    ShareRoleDto? UserRole,
+    Guid? OwnerId,
+    string? OwnerName
 );

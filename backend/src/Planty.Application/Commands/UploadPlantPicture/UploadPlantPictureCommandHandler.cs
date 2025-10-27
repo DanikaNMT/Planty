@@ -1,6 +1,7 @@
 namespace Planty.Application.Commands.UploadPlantPicture;
 
 using MediatR;
+using Planty.Application.Interfaces;
 using Planty.Application.Services;
 using Planty.Contracts.Plants;
 using Planty.Domain.Entities;
@@ -11,26 +12,35 @@ public class UploadPlantPictureCommandHandler : IRequestHandler<UploadPlantPictu
     private readonly IPlantRepository _plantRepository;
     private readonly IPlantPictureRepository _pictureRepository;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IPermissionService _permissionService;
     private static readonly string[] AllowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
     private const long MaxFileSize = 10 * 1024 * 1024; // 10MB
 
     public UploadPlantPictureCommandHandler(
         IPlantRepository plantRepository,
         IPlantPictureRepository pictureRepository,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IPermissionService permissionService)
     {
         _plantRepository = plantRepository;
         _pictureRepository = pictureRepository;
         _fileStorageService = fileStorageService;
+        _permissionService = permissionService;
     }
 
     public async Task<PlantPictureResponse> Handle(UploadPlantPictureCommand request, CancellationToken cancellationToken)
     {
-        // Validate plant exists and user owns it
+        // Validate plant exists
         var plant = await _plantRepository.GetByIdAsync(request.PlantId, cancellationToken);
-        if (plant == null || plant.UserId != request.UserId)
+        if (plant == null)
         {
-            throw new Exception("Plant not found or access denied");
+            throw new InvalidOperationException("Plant not found");
+        }
+
+        // Check if user has permission to perform care actions (including taking pictures)
+        if (!await _permissionService.CanUserCarePlantAsync(request.PlantId, request.UserId, cancellationToken))
+        {
+            throw new UnauthorizedAccessException("You don't have permission to upload pictures for this plant.");
         }
 
         // Validate file extension

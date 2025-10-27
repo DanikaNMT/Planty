@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Planty.Application.Common;
+using Planty.Application.Interfaces;
 using Planty.Contracts.Plants;
 using Planty.Domain.Entities;
 using Planty.Domain.Repositories;
@@ -14,8 +15,8 @@ namespace Planty.Application.Commands.FertilizePlant
         private readonly IPlantRepository _plantRepository;
         private readonly IFertilizationRepository _fertilizationRepository;
 
-        public FertilizePlantCommandHandler(IPlantRepository plantRepository, IFertilizationRepository fertilizationRepository)
-            : base(plantRepository)
+        public FertilizePlantCommandHandler(IPlantRepository plantRepository, IFertilizationRepository fertilizationRepository, IPermissionService permissionService)
+            : base(plantRepository, permissionService)
         {
             _plantRepository = plantRepository;
             _fertilizationRepository = fertilizationRepository;
@@ -23,7 +24,7 @@ namespace Planty.Application.Commands.FertilizePlant
 
         public async Task<PlantResponse> Handle(FertilizePlantCommand request, CancellationToken cancellationToken)
         {
-            var plant = await ValidatePlantOwnershipAsync(request.PlantId, request.UserId, cancellationToken);
+            var plant = await ValidatePlantCarePermissionAsync(request.PlantId, request.UserId, cancellationToken);
 
             // Create a new fertilization record
             var fertilization = new Fertilization

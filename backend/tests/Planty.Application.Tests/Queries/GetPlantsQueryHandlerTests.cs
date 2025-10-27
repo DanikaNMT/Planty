@@ -9,12 +9,14 @@ using Planty.Domain.Repositories;
 public class GetPlantsQueryHandlerTests
 {
     private readonly Mock<IPlantRepository> _mockRepository;
+    private readonly Mock<IShareRepository> _mockShareRepository;
     private readonly GetPlantsQueryHandler _handler;
 
     public GetPlantsQueryHandlerTests()
     {
         _mockRepository = new Mock<IPlantRepository>();
-        _handler = new GetPlantsQueryHandler(_mockRepository.Object);
+        _mockShareRepository = new Mock<IShareRepository>();
+        _handler = new GetPlantsQueryHandler(_mockRepository.Object, _mockShareRepository.Object);
     }
 
     [Fact]
@@ -34,6 +36,10 @@ public class GetPlantsQueryHandlerTests
         _mockRepository
             .Setup(r => r.GetAllByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(plants);
+
+        _mockShareRepository
+            .Setup(r => r.GetSharedPlantIdsForUserAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Guid>());
 
         var query = new GetPlantsQuery(userId);
 

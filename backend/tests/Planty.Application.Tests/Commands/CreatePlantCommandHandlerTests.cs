@@ -11,13 +11,21 @@ public class CreatePlantCommandHandlerTests
 {
     private readonly Mock<IPlantRepository> _mockPlantRepository;
     private readonly Mock<ISpeciesRepository> _mockSpeciesRepository;
+    private readonly Mock<ILocationRepository> _mockLocationRepository;
+    private readonly Mock<IPermissionService> _mockPermissionService;
     private readonly CreatePlantCommandHandler _handler;
 
     public CreatePlantCommandHandlerTests()
     {
         _mockPlantRepository = new Mock<IPlantRepository>();
         _mockSpeciesRepository = new Mock<ISpeciesRepository>();
-        _handler = new CreatePlantCommandHandler(_mockPlantRepository.Object, _mockSpeciesRepository.Object);
+        _mockLocationRepository = new Mock<ILocationRepository>();
+        _mockPermissionService = new Mock<IPermissionService>();
+        _handler = new CreatePlantCommandHandler(
+            _mockPlantRepository.Object, 
+            _mockSpeciesRepository.Object,
+            _mockLocationRepository.Object,
+            _mockPermissionService.Object);
     }
 
     [Fact]

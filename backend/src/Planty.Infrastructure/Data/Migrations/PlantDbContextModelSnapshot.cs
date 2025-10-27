@@ -140,6 +140,46 @@ namespace Planty.Infrastructure.Data.Migrations
                     b.ToTable("PlantPictures");
                 });
 
+            modelBuilder.Entity("Planty.Domain.Entities.Share", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("LocationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("PlantId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ShareType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("SharedWithUserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("PlantId");
+
+                    b.HasIndex("SharedWithUserId");
+
+                    b.ToTable("Shares");
+                });
+
             modelBuilder.Entity("Planty.Domain.Entities.Species", b =>
                 {
                     b.Property<Guid>("Id")
@@ -277,6 +317,39 @@ namespace Planty.Infrastructure.Data.Migrations
                     b.Navigation("Plant");
                 });
 
+            modelBuilder.Entity("Planty.Domain.Entities.Share", b =>
+                {
+                    b.HasOne("Planty.Domain.Entities.Location", "Location")
+                        .WithMany("Shares")
+                        .HasForeignKey("LocationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Planty.Domain.Entities.User", "Owner")
+                        .WithMany("SharesCreated")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Planty.Domain.Entities.Plant", "Plant")
+                        .WithMany("Shares")
+                        .HasForeignKey("PlantId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Planty.Domain.Entities.User", "SharedWithUser")
+                        .WithMany("SharesReceived")
+                        .HasForeignKey("SharedWithUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("Owner");
+
+                    b.Navigation("Plant");
+
+                    b.Navigation("SharedWithUser");
+                });
+
             modelBuilder.Entity("Planty.Domain.Entities.Species", b =>
                 {
                     b.HasOne("Planty.Domain.Entities.User", "User")
@@ -302,6 +375,8 @@ namespace Planty.Infrastructure.Data.Migrations
             modelBuilder.Entity("Planty.Domain.Entities.Location", b =>
                 {
                     b.Navigation("Plants");
+
+                    b.Navigation("Shares");
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.Plant", b =>
@@ -309,6 +384,8 @@ namespace Planty.Infrastructure.Data.Migrations
                     b.Navigation("Fertilizations");
 
                     b.Navigation("Pictures");
+
+                    b.Navigation("Shares");
 
                     b.Navigation("Waterings");
                 });
@@ -323,6 +400,10 @@ namespace Planty.Infrastructure.Data.Migrations
                     b.Navigation("Locations");
 
                     b.Navigation("Plants");
+
+                    b.Navigation("SharesCreated");
+
+                    b.Navigation("SharesReceived");
 
                     b.Navigation("Species");
                 });

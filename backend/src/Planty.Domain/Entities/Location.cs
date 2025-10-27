@@ -13,4 +13,7 @@ public class Location
 
     // Plants in this location
     public ICollection<Plant> Plants { get; set; } = new List<Plant>();
+    
+    // Sharing
+    public ICollection<Share> Shares { get; set; } = new List<Share>();
 }

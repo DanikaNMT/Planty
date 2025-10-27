@@ -9,4 +9,10 @@ public class User
     public ICollection<Plant> Plants { get; set; } = new List<Plant>();
     public ICollection<Location> Locations { get; set; } = new List<Location>();
     public ICollection<Species> Species { get; set; } = new List<Species>();
+    
+    // Shares created by this user
+    public ICollection<Share> SharesCreated { get; set; } = new List<Share>();
+    
+    // Shares received by this user
+    public ICollection<Share> SharesReceived { get; set; } = new List<Share>();
 }

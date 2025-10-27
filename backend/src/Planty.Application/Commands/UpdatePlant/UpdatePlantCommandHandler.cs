@@ -11,15 +11,18 @@ public class UpdatePlantCommandHandler : IRequestHandler<UpdatePlantCommand, Pla
     private readonly IPlantRepository _plantRepository;
     private readonly ILocationRepository _locationRepository;
     private readonly ISpeciesRepository _speciesRepository;
+    private readonly IPermissionService _permissionService;
 
     public UpdatePlantCommandHandler(
         IPlantRepository plantRepository,
         ILocationRepository locationRepository,
-        ISpeciesRepository speciesRepository)
+        ISpeciesRepository speciesRepository,
+        IPermissionService permissionService)
     {
         _plantRepository = plantRepository;
         _locationRepository = locationRepository;
         _speciesRepository = speciesRepository;
+        _permissionService = permissionService;
     }
 
     public async Task<PlantResponse> Handle(UpdatePlantCommand request, CancellationToken cancellationToken)
@@ -31,7 +34,8 @@ public class UpdatePlantCommandHandler : IRequestHandler<UpdatePlantCommand, Pla
             throw new InvalidOperationException($"Plant with ID {request.PlantId} not found.");
         }
 
-        if (plant.UserId != request.UserId)
+        // Check if user has permission to edit this plant
+        if (!await _permissionService.CanUserEditPlantAsync(plant.Id, request.UserId, cancellationToken))
         {
             throw new UnauthorizedAccessException("You don't have permission to update this plant.");
         }

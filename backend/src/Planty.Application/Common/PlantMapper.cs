@@ -1,6 +1,7 @@
 namespace Planty.Application.Common;
 
 using Planty.Contracts.Plants;
+using Planty.Contracts.Shares;
 using Planty.Domain.Entities;
 
 /// <summary>
@@ -8,7 +9,7 @@ using Planty.Domain.Entities;
 /// </summary>
 public static class PlantMapper
 {
-    public static PlantResponse MapToResponse(Plant plant)
+    public static PlantResponse MapToResponse(Plant plant, bool isShared = false, ShareRoleDto? userRole = null, Guid? ownerId = null, string? ownerName = null)
     {
         var lastWatered = plant.Waterings.OrderByDescending(w => w.WateredAt).FirstOrDefault()?.WateredAt;
         var lastFertilized = plant.Fertilizations.OrderByDescending(f => f.FertilizedAt).FirstOrDefault()?.FertilizedAt;
@@ -37,7 +38,11 @@ public static class PlantMapper
             lastFertilized,
             fertilizationInterval,
             nextFertilizationDue,
-            latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null
+            latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null,
+            isShared,
+            userRole,
+            ownerId,
+            ownerName
         );
     }
 

@@ -26,6 +26,15 @@ public class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
     }
 
+    public async Task<IEnumerable<User>> SearchUsersAsync(string searchTerm, int limit = 10, CancellationToken cancellationToken = default)
+    {
+        var lowerSearchTerm = searchTerm.ToLower();
+        return await _context.Users
+            .Where(u => u.Email.ToLower().Contains(lowerSearchTerm) || u.UserName.ToLower().Contains(lowerSearchTerm))
+            .Take(limit)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task UpdateAsync(User user, CancellationToken cancellationToken = default)
     {
         _context.Users.Update(user);

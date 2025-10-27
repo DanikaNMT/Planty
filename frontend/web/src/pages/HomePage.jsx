@@ -132,6 +132,28 @@ export function HomePage({ navigate }) {
             <div className="plant-card-content">
               <div className="plant-card-title">
                 {p.name}{p.speciesName ? ` - ${p.speciesName}` : ''}
+                {p.isShared && (
+                  <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '0.25rem', 
+                    marginLeft: '0.5rem',
+                    padding: '0.25rem 0.5rem',
+                    backgroundColor: 'var(--color-primary-light)',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.75rem',
+                    fontWeight: '500',
+                    color: 'var(--color-primary-dark)'
+                  }}>
+                    <span>👥</span>
+                    <span>
+                      {p.userRole === 0 && 'Viewer'}
+                      {p.userRole === 1 && 'Carer'}
+                      {p.userRole === 2 && 'Editor'}
+                      {p.userRole === 3 && 'Owner'}
+                    </span>
+                  </span>
+                )}
               </div>
               <div className="plant-info">
                 <div>💧 Last watered: <strong>{p.lastWatered ? formatDate(p.lastWatered) : 'Never'}</strong></div>
@@ -144,20 +166,25 @@ export function HomePage({ navigate }) {
                 )}
               </div>
               <div className="plant-actions" onClick={(e) => e.stopPropagation()}>
-                <button
-                  onClick={() => handleWaterPlant(p.id, p.name)}
-                  disabled={wateringStates[p.id]}
-                  className="btn-water"
-                >
-                  {wateringStates[p.id] ? '⏳ Watering...' : '💧 Water'}
-                </button>
-                <button
-                  onClick={() => handleFertilizePlant(p.id, p.name)}
-                  disabled={fertilizingStates[p.id]}
-                  className="btn-fertilizer"
-                >
-                  {fertilizingStates[p.id] ? '⏳ Fertilizing...' : '🌿 Fertilize'}
-                </button>
+                {/* Only show buttons if user has Carer role or higher (or not shared) */}
+                {(!p.isShared || (p.userRole !== null && p.userRole >= 1)) && (
+                  <>
+                    <button
+                      onClick={() => handleWaterPlant(p.id, p.name)}
+                      disabled={wateringStates[p.id]}
+                      className="btn-water"
+                    >
+                      {wateringStates[p.id] ? '⏳ Watering...' : '💧 Water'}
+                    </button>
+                    <button
+                      onClick={() => handleFertilizePlant(p.id, p.name)}
+                      disabled={fertilizingStates[p.id]}
+                      className="btn-fertilizer"
+                    >
+                      {fertilizingStates[p.id] ? '⏳ Fertilizing...' : '🌿 Fertilize'}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

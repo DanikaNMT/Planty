@@ -36,7 +36,11 @@ public class CreateLocationCommandHandler : IRequestHandler<CreateLocationComman
             location.Name,
             location.Description,
             location.IsDefault,
-            location.Plants?.Count ?? 0
+            location.Plants?.Count ?? 0,
+            IsShared: false,
+            UserRole: null,
+            OwnerId: null,
+            OwnerName: null
         );
     }
 }
