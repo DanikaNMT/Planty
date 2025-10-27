@@ -30,6 +30,16 @@ public class SpeciesRepository : ISpeciesRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Species>> GetSpeciesByPlantIdsAsync(IEnumerable<Guid> plantIds, CancellationToken cancellationToken = default)
+    {
+        return await _context.Species
+            .Include(s => s.Plants)
+            .Where(s => s.Plants.Any(p => plantIds.Contains(p.Id)))
+            .Distinct()
+            .OrderBy(s => s.Name)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<Species> AddAsync(Species species, CancellationToken cancellationToken = default)
     {
         _context.Species.Add(species);

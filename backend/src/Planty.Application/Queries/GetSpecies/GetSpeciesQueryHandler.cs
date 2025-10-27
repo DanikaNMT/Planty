@@ -32,6 +32,11 @@ public class GetSpeciesQueryHandler : IRequestHandler<GetSpeciesQuery, IEnumerab
             sharedSpecies.AddRange(ownerSpecies);
         }
         
+        // Get species from individually shared plants (including location shares)
+        var sharedPlantIds = await _shareRepository.GetSharedPlantIdsForUserAsync(request.UserId, cancellationToken);
+        var sharedPlantSpecies = await _speciesRepository.GetSpeciesByPlantIdsAsync(sharedPlantIds, cancellationToken);
+        sharedSpecies.AddRange(sharedPlantSpecies);
+        
         // Combine and deduplicate by ID
         var allSpecies = ownedSpecies.Concat(sharedSpecies).DistinctBy(s => s.Id);
         

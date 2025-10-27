@@ -6,6 +6,7 @@ public interface ISpeciesRepository
 {
     Task<Species?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Species>> GetAllByUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Species>> GetSpeciesByPlantIdsAsync(IEnumerable<Guid> plantIds, CancellationToken cancellationToken = default);
     Task<Species> AddAsync(Species species, CancellationToken cancellationToken = default);
     Task UpdateAsync(Species species, CancellationToken cancellationToken = default);
     Task DeleteAsync(Species species, CancellationToken cancellationToken = default);

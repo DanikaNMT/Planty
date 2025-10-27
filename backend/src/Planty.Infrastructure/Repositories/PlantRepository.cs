@@ -19,9 +19,10 @@ public class PlantRepository : IPlantRepository
         return await _context.Plants
             .Include(p => p.Species)
             .Include(p => p.Location)
-            .Include(p => p.Waterings.OrderByDescending(w => w.WateredAt).Take(1))
-            .Include(p => p.Fertilizations.OrderByDescending(f => f.FertilizedAt).Take(1))
-            .Include(p => p.Pictures.OrderByDescending(pic => pic.TakenAt).Take(1))
+            .Include(p => p.User) // Load user for shared plant ownership info
+            .Include(p => p.Waterings) // Load ALL waterings for care history
+            .Include(p => p.Fertilizations) // Load ALL fertilizations for care history
+            .Include(p => p.Pictures) // Load ALL pictures
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 

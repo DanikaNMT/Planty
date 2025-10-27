@@ -50,6 +50,13 @@ public class GetPlantTodosQueryHandler : IRequestHandler<GetPlantTodosQuery, IEn
             if (plant.Species == null)
                 continue;
 
+            // Determine if plant is shared and get user's role
+            bool isShared = plant.UserId != request.UserId;
+            var userRole = isShared 
+                ? await _shareRepository.GetUserRoleForPlantAsync(plant.Id, request.UserId, cancellationToken)
+                : null;
+            var roleDto = userRole.HasValue ? (Contracts.Shares.ShareRoleDto?)userRole.Value : null;
+
             // Check for watering todos
             if (plant.Species.WateringIntervalDays.HasValue)
             {
@@ -67,7 +74,11 @@ public class GetPlantTodosQueryHandler : IRequestHandler<GetPlantTodosQuery, IEn
                         plant.Species.Name,
                         "Water",
                         nextWateringDue,
-                        latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null
+                        latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null,
+                        isShared,
+                        roleDto,
+                        isShared ? plant.UserId : null,
+                        isShared ? plant.User?.UserName : null
                     ));
                 }
             }
@@ -89,7 +100,11 @@ public class GetPlantTodosQueryHandler : IRequestHandler<GetPlantTodosQuery, IEn
                         plant.Species.Name,
                         "Fertilize",
                         nextFertilizationDue,
-                        latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null
+                        latestPicture != null ? $"/api/plants/pictures/{latestPicture.Id}" : null,
+                        isShared,
+                        roleDto,
+                        isShared ? plant.UserId : null,
+                        isShared ? plant.User?.UserName : null
                     ));
                 }
             }
