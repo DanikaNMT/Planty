@@ -11,10 +11,13 @@ public interface IShareRepository
     Task<IEnumerable<Share>> GetLocationSharesForUserAsync(Guid locationId, Guid userId, CancellationToken cancellationToken = default);
     Task<Share?> GetShareForPlantAndUserAsync(Guid plantId, Guid userId, CancellationToken cancellationToken = default);
     Task<Share?> GetShareForLocationAndUserAsync(Guid locationId, Guid userId, CancellationToken cancellationToken = default);
+    Task<Share?> GetCollectionShareAsync(Guid ownerId, Guid sharedWithUserId, CancellationToken cancellationToken = default);
     Task<ShareRole?> GetUserRoleForPlantAsync(Guid plantId, Guid userId, CancellationToken cancellationToken = default);
     Task<ShareRole?> GetUserRoleForLocationAsync(Guid locationId, Guid userId, CancellationToken cancellationToken = default);
+    Task<ShareRole?> GetUserRoleForCollectionAsync(Guid ownerId, Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Guid>> GetSharedPlantIdsForUserAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Guid>> GetSharedLocationIdsForUserAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Guid>> GetOwnerIdsWithCollectionAccessAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<Share> AddAsync(Share share, CancellationToken cancellationToken = default);
     Task UpdateAsync(Share share, CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);

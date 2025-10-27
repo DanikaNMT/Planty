@@ -449,7 +449,9 @@ function SharesCreatedTab({ shares, loading, error, onDelete, onUpdateRole, onCr
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 'var(--spacing-sm)' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: 'var(--spacing-xs)' }}>
-                    {share.shareType === 0 ? '🌱' : '📍'} {share.plantName || share.locationName}
+                    {share.shareType === 0 && '🌱 ' + share.plantName}
+                    {share.shareType === 1 && '📍 ' + share.locationName}
+                    {share.shareType === 2 && '🌿 Entire Collection'}
                   </div>
                   <div style={{ color: 'var(--color-text-light)', fontSize: '0.9rem' }}>
                     Shared with: <strong>{share.sharedWithUser.email}</strong>
@@ -557,7 +559,9 @@ function SharesReceivedTab({ shares, loading, error }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: '600', fontSize: '1.1rem', marginBottom: 'var(--spacing-xs)' }}>
-                    {share.shareType === 0 ? '🌱' : '📍'} {share.plantName || share.locationName}
+                    {share.shareType === 0 && '🌱 ' + share.plantName}
+                    {share.shareType === 1 && '📍 ' + share.locationName}
+                    {share.shareType === 2 && '🌿 Entire Collection'}
                   </div>
                   <div style={{ color: 'var(--color-text-light)', fontSize: '0.9rem' }}>
                     Shared by: <strong>{share.owner.email}</strong>
@@ -638,7 +642,7 @@ function CreateShareModal({ plants, locations, onClose, onSuccess }) {
     e.preventDefault();
     setError(null);
 
-    if (!selectedItem) {
+    if (shareType !== ShareType.Collection && !selectedItem) {
       setError('Please select a plant or location to share');
       return;
     }
@@ -698,7 +702,7 @@ function CreateShareModal({ plants, locations, onClose, onSuccess }) {
           {/* Share Type */}
           <div className="form-group">
             <label>What do you want to share?</label>
-            <div style={{ display: 'flex', gap: 'var(--spacing-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
                 <input 
                   type="radio"
@@ -717,25 +721,36 @@ function CreateShareModal({ plants, locations, onClose, onSuccess }) {
                 />
                 <span>📍 Location</span>
               </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)', cursor: 'pointer' }}>
+                <input 
+                  type="radio"
+                  value={ShareType.Collection}
+                  checked={shareType === ShareType.Collection}
+                  onChange={() => setShareType(ShareType.Collection)}
+                />
+                <span>🌿 Entire Collection (all plants and locations)</span>
+              </label>
             </div>
           </div>
 
-          {/* Select Item */}
-          <div className="form-group">
-            <label>{shareType === ShareType.Plant ? '🌱 Select Plant *' : '📍 Select Location *'}</label>
-            <select 
-              value={selectedItem}
-              onChange={e => setSelectedItem(e.target.value)}
-              required
-            >
-              <option value="">-- Select {shareType === ShareType.Plant ? 'a plant' : 'a location'} --</option>
-              {items.map(item => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Select Item - Only show for Plant and Location */}
+          {shareType !== ShareType.Collection && (
+            <div className="form-group">
+              <label>{shareType === ShareType.Plant ? '🌱 Select Plant *' : '📍 Select Location *'}</label>
+              <select 
+                value={selectedItem}
+                onChange={e => setSelectedItem(e.target.value)}
+                required
+              >
+                <option value="">-- Select {shareType === ShareType.Plant ? 'a plant' : 'a location'} --</option>
+                {items.map(item => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* User Search */}
           <div className="form-group">

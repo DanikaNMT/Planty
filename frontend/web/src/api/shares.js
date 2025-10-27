@@ -5,7 +5,8 @@ import { apiFetch } from './client.js';
  */
 export const ShareType = {
   Plant: 0,
-  Location: 1
+  Location: 1,
+  Collection: 2
 };
 
 /**

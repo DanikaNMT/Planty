@@ -75,7 +75,7 @@ public class CreateShareCommandHandler : IRequestHandler<CreateShareCommand, Sha
                 Role = (ShareRole)request.Role
             };
         }
-        else // Location
+        else if (request.ShareType == ShareTypeDto.Location)
         {
             // Verify location exists and user has permission to share it
             var location = await _locationRepository.GetByIdAsync(request.LocationId!.Value, cancellationToken);
@@ -102,6 +102,25 @@ public class CreateShareCommandHandler : IRequestHandler<CreateShareCommand, Sha
                 SharedWithUserId = sharedWithUser.Id,
                 ShareType = ShareType.Location,
                 LocationId = location.Id,
+                Role = (ShareRole)request.Role
+            };
+        }
+        else // Collection
+        {
+            // Check if collection is already shared with this user
+            var existingShare = await _shareRepository.GetCollectionShareAsync(request.OwnerId, sharedWithUser.Id, cancellationToken);
+            if (existingShare != null)
+            {
+                throw new InvalidOperationException($"Your collection is already shared with {sharedWithUser.Email}.");
+            }
+
+            share = new Share
+            {
+                OwnerId = request.OwnerId,
+                SharedWithUserId = sharedWithUser.Id,
+                ShareType = ShareType.Collection,
+                PlantId = null,
+                LocationId = null,
                 Role = (ShareRole)request.Role
             };
         }

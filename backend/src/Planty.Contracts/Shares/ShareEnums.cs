@@ -3,7 +3,8 @@ namespace Planty.Contracts.Shares;
 public enum ShareTypeDto
 {
     Plant = 0,
-    Location = 1
+    Location = 1,
+    Collection = 2
 }
 
 public enum ShareRoleDto

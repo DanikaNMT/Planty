@@ -76,6 +76,12 @@ public class ShareRepository : IShareRepository
             .FirstOrDefaultAsync(s => s.LocationId == locationId && s.SharedWithUserId == userId, cancellationToken);
     }
 
+    public async Task<Share?> GetCollectionShareAsync(Guid ownerId, Guid sharedWithUserId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Shares
+            .FirstOrDefaultAsync(s => s.ShareType == ShareType.Collection && s.OwnerId == ownerId && s.SharedWithUserId == sharedWithUserId, cancellationToken);
+    }
+
     public async Task<ShareRole?> GetUserRoleForPlantAsync(Guid plantId, Guid userId, CancellationToken cancellationToken = default)
     {
         // First check if user owns the plant
@@ -97,7 +103,7 @@ public class ShareRepository : IShareRepository
             return plantShare.Role;
         }
 
-        // Finally check if plant is in a shared location
+        // Check if plant is in a shared location
         if (plant?.LocationId != null)
         {
             var locationShare = await _context.Shares
@@ -107,6 +113,19 @@ public class ShareRepository : IShareRepository
             if (locationShare != null)
             {
                 return locationShare.Role;
+            }
+        }
+
+        // Finally check for collection-level share
+        if (plant != null)
+        {
+            var collectionShare = await _context.Shares
+                .Where(s => s.ShareType == ShareType.Collection && s.OwnerId == plant.UserId && s.SharedWithUserId == userId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (collectionShare != null)
+            {
+                return collectionShare.Role;
             }
         }
 
@@ -129,7 +148,39 @@ public class ShareRepository : IShareRepository
             .Where(s => s.LocationId == locationId && s.SharedWithUserId == userId)
             .FirstOrDefaultAsync(cancellationToken);
 
-        return locationShare?.Role;
+        if (locationShare != null)
+        {
+            return locationShare.Role;
+        }
+
+        // Finally check for collection-level share
+        if (location != null)
+        {
+            var collectionShare = await _context.Shares
+                .Where(s => s.ShareType == ShareType.Collection && s.OwnerId == location.UserId && s.SharedWithUserId == userId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (collectionShare != null)
+            {
+                return collectionShare.Role;
+            }
+        }
+
+        return null;
+    }
+
+    public async Task<ShareRole?> GetUserRoleForCollectionAsync(Guid ownerId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        if (ownerId == userId)
+        {
+            return ShareRole.Owner;
+        }
+
+        var collectionShare = await _context.Shares
+            .Where(s => s.ShareType == ShareType.Collection && s.OwnerId == ownerId && s.SharedWithUserId == userId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return collectionShare?.Role;
     }
 
     public async Task<IEnumerable<Guid>> GetSharedPlantIdsForUserAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -151,14 +202,47 @@ public class ShareRepository : IShareRepository
             .Select(p => p.Id)
             .ToListAsync(cancellationToken);
 
-        return directPlantIds.Concat(locationPlantIds).Distinct();
+        // Get plants from collection shares
+        var collectionOwnerIds = await _context.Shares
+            .Where(s => s.ShareType == ShareType.Collection && s.SharedWithUserId == userId)
+            .Select(s => s.OwnerId)
+            .ToListAsync(cancellationToken);
+
+        var collectionPlantIds = await _context.Plants
+            .Where(p => collectionOwnerIds.Contains(p.UserId))
+            .Select(p => p.Id)
+            .ToListAsync(cancellationToken);
+
+        return directPlantIds.Concat(locationPlantIds).Concat(collectionPlantIds).Distinct();
     }
 
     public async Task<IEnumerable<Guid>> GetSharedLocationIdsForUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await _context.Shares
+        // Get directly shared locations
+        var directLocationIds = await _context.Shares
             .Where(s => s.ShareType == ShareType.Location && s.SharedWithUserId == userId)
             .Select(s => s.LocationId!.Value)
+            .ToListAsync(cancellationToken);
+
+        // Get locations from collection shares
+        var collectionOwnerIds = await _context.Shares
+            .Where(s => s.ShareType == ShareType.Collection && s.SharedWithUserId == userId)
+            .Select(s => s.OwnerId)
+            .ToListAsync(cancellationToken);
+
+        var collectionLocationIds = await _context.Locations
+            .Where(l => collectionOwnerIds.Contains(l.UserId))
+            .Select(l => l.Id)
+            .ToListAsync(cancellationToken);
+
+        return directLocationIds.Concat(collectionLocationIds).Distinct();
+    }
+
+    public async Task<IEnumerable<Guid>> GetOwnerIdsWithCollectionAccessAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Shares
+            .Where(s => s.ShareType == ShareType.Collection && s.SharedWithUserId == userId)
+            .Select(s => s.OwnerId)
             .ToListAsync(cancellationToken);
     }
 

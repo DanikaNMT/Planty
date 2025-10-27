@@ -24,5 +24,13 @@ public class CreateShareCommandValidator : AbstractValidator<CreateShareCommand>
         RuleFor(x => x.LocationId)
             .NotNull().When(x => x.ShareType == ShareTypeDto.Location)
             .WithMessage("Location ID is required when sharing a location");
+        
+        RuleFor(x => x.PlantId)
+            .Null().When(x => x.ShareType == ShareTypeDto.Collection)
+            .WithMessage("Plant ID must be null when sharing a collection");
+        
+        RuleFor(x => x.LocationId)
+            .Null().When(x => x.ShareType == ShareTypeDto.Collection)
+            .WithMessage("Location ID must be null when sharing a collection");
     }
 }
