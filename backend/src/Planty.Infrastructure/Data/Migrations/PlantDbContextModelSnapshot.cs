@@ -42,7 +42,7 @@ namespace Planty.Infrastructure.Data.Migrations
 
                     b.HasIndex("PlantId", "FertilizedAt");
 
-                    b.ToTable("Fertilizations");
+                    b.ToTable("Fertilizations", (string)null);
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.Location", b =>
@@ -72,7 +72,7 @@ namespace Planty.Infrastructure.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.Plant", b =>
@@ -114,7 +114,7 @@ namespace Planty.Infrastructure.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Plants");
+                    b.ToTable("Plants", (string)null);
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.PlantPicture", b =>
@@ -147,7 +147,7 @@ namespace Planty.Infrastructure.Data.Migrations
 
                     b.HasIndex("PlantId", "TakenAt");
 
-                    b.ToTable("PlantPictures");
+                    b.ToTable("PlantPictures", (string)null);
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.Share", b =>
@@ -187,7 +187,7 @@ namespace Planty.Infrastructure.Data.Migrations
 
                     b.HasIndex("SharedWithUserId");
 
-                    b.ToTable("Shares");
+                    b.ToTable("Shares", (string)null);
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.Species", b =>
@@ -218,7 +218,7 @@ namespace Planty.Infrastructure.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Species");
+                    b.ToTable("Species", (string)null);
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.User", b =>
@@ -243,7 +243,7 @@ namespace Planty.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.Watering", b =>
@@ -271,7 +271,7 @@ namespace Planty.Infrastructure.Data.Migrations
 
                     b.HasIndex("PlantId", "WateredAt");
 
-                    b.ToTable("Waterings");
+                    b.ToTable("Waterings", (string)null);
                 });
 
             modelBuilder.Entity("Planty.Domain.Entities.Fertilization", b =>
