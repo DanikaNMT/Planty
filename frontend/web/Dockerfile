@@ -33,6 +33,10 @@ RUN npm ci || npm install
 # Copy source code
 COPY . .
 
+# Accept build argument for API base URL
+ARG VITE_API_BASE=http://localhost:5153
+ENV VITE_API_BASE=${VITE_API_BASE}
+
 # Build the application
 RUN npm run build
 

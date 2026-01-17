@@ -50,9 +50,11 @@ services:
       context: ./frontend/web
       dockerfile: Dockerfile
       target: production
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-http://planty.arnodece.com}
     container_name: planty-frontend
     environment:
-      VITE_API_BASE: ${VITE_API_URL:-http://api:5000}
+      NODE_ENV: production
     networks:
       - planty-network
     restart: unless-stopped
