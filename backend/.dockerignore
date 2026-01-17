@@ -12,4 +12,5 @@
 **/npm-debug.log
 **/publish
 **/backups
-**/scripts
+# Note: scripts/ directory is needed for entrypoint.sh in Docker image
+# **/scripts
