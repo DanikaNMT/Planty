@@ -36,15 +36,14 @@ echo "Applying database migrations..."
 cd /app
 
 # Apply migrations using the MigrationTool
-if [ -f "/app/Planty.MigrationTool" ]; then
+if [ -f "/app/migration/Planty.MigrationTool.dll" ]; then
   echo "Running MigrationTool..."
-  chmod +x /app/Planty.MigrationTool
-  ./Planty.MigrationTool || {
+  dotnet /app/migration/Planty.MigrationTool.dll || {
     echo "ERROR: Migration tool failed"
     exit 1
   }
 else
-  echo "ERROR: Planty.MigrationTool not found at /app/Planty.MigrationTool"
+  echo "ERROR: Planty.MigrationTool.dll not found at /app/migration/Planty.MigrationTool.dll"
   exit 1
 fi
 

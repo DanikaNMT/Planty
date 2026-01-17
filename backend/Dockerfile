@@ -15,11 +15,11 @@ RUN dotnet build "Planty.API.csproj" -c Release -o /app/build
 
 # Publish stage
 FROM build AS publish
-RUN dotnet publish "Planty.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Planty.API.csproj" -c Release -o /app/api-publish /p:UseAppHost=false
 
 # Publish migration tool
 WORKDIR "/src/src/Planty.MigrationTool"
-RUN dotnet publish "Planty.MigrationTool.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Planty.MigrationTool.csproj" -c Release -o /app/migration-publish /p:UseAppHost=false
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0-bookworm-slim AS final
@@ -30,7 +30,8 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=publish /app/publish .
+COPY --from=publish /app/api-publish .
+COPY --from=publish /app/migration-publish /app/migration
 
 # Copy entrypoint and helper scripts
 COPY scripts/ /app/scripts/
