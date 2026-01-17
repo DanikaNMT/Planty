@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=publish /app/publish .
 
 # Copy entrypoint and helper scripts
-COPY ["scripts/", "/app/scripts/"]
+COPY scripts/ /app/scripts/
 
 # Create data directory for uploads
 RUN mkdir -p /app/data/uploads && chmod -R 755 /app/data
