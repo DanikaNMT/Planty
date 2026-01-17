@@ -52,7 +52,7 @@ services:
       target: production
     container_name: planty-frontend
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://api:5000}
+      VITE_API_BASE: ${VITE_API_URL:-http://api:5000}
     networks:
       - planty-network
     restart: unless-stopped
