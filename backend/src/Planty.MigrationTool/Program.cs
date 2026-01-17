@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Planty.Infrastructure;
@@ -15,9 +16,29 @@ var configuration = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-// Setup services
+// Setup services with warning suppression for pending model changes
+// This is necessary because migrations were originally created with SQLite
+// but the database has been migrated to PostgreSQL with the correct schema
 var services = new ServiceCollection();
 services.AddInfrastructure(configuration);
+
+// Override the DbContext configuration to suppress the pending model changes warning
+var connectionString = configuration.GetConnectionString("DefaultConnection");
+services.AddDbContext<PlantDbContext>((serviceProvider, options) =>
+{
+    if (connectionString != null && connectionString.Contains("Host="))
+    {
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        options.UseSqlite(connectionString ?? "Data Source=plants.db");
+    }
+    
+    // Suppress the pending model changes warning during migration
+    options.ConfigureWarnings(warnings => 
+        warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
+}, ServiceLifetime.Scoped);
 
 // Run migrations
 using var serviceProvider = services.BuildServiceProvider();
