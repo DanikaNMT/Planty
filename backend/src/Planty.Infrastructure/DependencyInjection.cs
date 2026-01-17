@@ -3,6 +3,7 @@ namespace Planty.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Planty.Application.Interfaces;
 using Planty.Application.Services;
 using Planty.Domain.Repositories;
@@ -16,8 +17,21 @@ public static class DependencyInjection
         this IServiceCollection services, 
         IConfiguration configuration)
     {
-        services.AddDbContext<PlantDbContext>(options =>
-            options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+        // Determine which database provider to use based on connection string
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        
+        if (connectionString != null && connectionString.Contains("Host="))
+        {
+            // PostgreSQL connection string detected
+            services.AddDbContext<PlantDbContext>(options =>
+                options.UseNpgsql(connectionString));
+        }
+        else
+        {
+            // Default to SQLite for backward compatibility
+            services.AddDbContext<PlantDbContext>(options =>
+                options.UseSqlite(connectionString ?? "Data Source=plants.db"));
+        }
 
         services.AddScoped<IPlantRepository, PlantRepository>();
         services.AddScoped<ILocationRepository, LocationRepository>();

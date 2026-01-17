@@ -1,0 +1,67 @@
+version: '3.8'
+
+# Development override configuration
+# This file extends docker-compose.yml with development-specific settings
+# To use: docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+
+services:
+  postgres:
+    # Use a local volume for easier debugging
+    environment:
+      POSTGRES_USER: planty
+      POSTGRES_PASSWORD: planty_password
+      POSTGRES_DB: plantydb
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+      target: final
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=plantydb;Username=planty;Password=planty_password;"
+    ports:
+      - "5000:5000"
+    # Mount source code and scripts for hot reload and editing
+    volumes:
+      - ./backend/src:/app/src:ro
+      - ./backend/scripts:/app/scripts:ro
+      - planty_uploads:/app/data/uploads
+    # Override entrypoint for development (optional - uncomment to use)
+    # entrypoint: dotnet watch run --project src/Planty.API/Planty.API.csproj
+
+  frontend:
+    build:
+      context: ./frontend/web
+      target: development  # Use development stage with node_modules
+    environment:
+      VITE_API_URL: http://localhost:5000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/web/src:/app/src
+      - ./frontend/web/public:/app/public
+      - ./frontend/web/index.html:/app/index.html
+      - ./frontend/web/vite.config.js:/app/vite.config.js
+    # Start Vite dev server with hot reload
+    command: npm run dev -- --host 0.0.0.0
+
+  nginx:
+    environment:
+      # Override for development - serve on standard HTTP port
+      NGINX_PORT: 80
+    ports:
+      - "80:80"
+    # In development, you might want to rebuild nginx config frequently
+    # volumes:
+    #   - ./nginx/conf.d:/etc/nginx/conf.d:ro
+
+volumes:
+  postgres_data:
+    # Use local driver for better performance in development
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  planty_uploads:
+  nginx_logs:

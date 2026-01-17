@@ -13,8 +13,10 @@ public class GetPlantCareHistoryQueryHandlerTests
     private readonly Mock<IWateringRepository> _wateringRepository;
     private readonly Mock<IFertilizationRepository> _fertilizationRepository;
     private readonly Mock<IPlantPictureRepository> _pictureRepository;
+    private readonly Mock<IShareRepository> _shareRepository;
     private readonly GetPlantCareHistoryQueryHandler _handler;
     private readonly Guid _userId;
+    private readonly User _testUser;
 
     public GetPlantCareHistoryQueryHandlerTests()
     {
@@ -22,12 +24,15 @@ public class GetPlantCareHistoryQueryHandlerTests
         _wateringRepository = new Mock<IWateringRepository>();
         _fertilizationRepository = new Mock<IFertilizationRepository>();
         _pictureRepository = new Mock<IPlantPictureRepository>();
+        _shareRepository = new Mock<IShareRepository>();
         _handler = new GetPlantCareHistoryQueryHandler(
             _plantRepository.Object, 
             _wateringRepository.Object,
             _fertilizationRepository.Object,
-            _pictureRepository.Object);
+            _pictureRepository.Object,
+            _shareRepository.Object);
         _userId = Guid.NewGuid();
+        _testUser = new User { Id = _userId, UserName = "TestUser", Email = "test@example.com" };
     }
 
     [Fact]
