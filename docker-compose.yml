@@ -33,6 +33,11 @@ services:
       JWT_KEY: ${JWT_KEY:-THIS_IS_A_SUPER_SECRET_KEY_1234567890!!}
       JWT_ISSUER: ${JWT_ISSUER:-Planty}
       JWT_AUDIENCE: ${JWT_AUDIENCE:-PlantyUsers}
+      DB_HOST: ${DB_HOST:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-planty}
+      DB_PASSWORD: ${DB_PASSWORD:-planty_password}
+      DB_NAME: ${DB_NAME:-plantydb}
     volumes:
       - planty_uploads:/app/data/uploads
     networks:
