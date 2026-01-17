@@ -35,22 +35,17 @@ echo ""
 echo "Applying database migrations..."
 cd /app
 
-# Check if migrations exist - if so, apply them
-if [ -d "/app/Migrations" ] || [ -f "/app/Planty.MigrationTool" ]; then
-  if [ -f "/app/Planty.MigrationTool" ]; then
-    echo "Running MigrationTool..."
-    ./Planty.MigrationTool || {
-      echo "ERROR: Migration tool failed"
-      exit 1
-    }
-  else
-    echo "Running EF Core migrations via dotnet..."
-    dotnet ef database update --project /app/Planty.API.dll 2>/dev/null || {
-      echo "Note: EF Core migrations not available in runtime"
-    }
-  fi
+# Apply migrations using the MigrationTool
+if [ -f "/app/Planty.MigrationTool" ]; then
+  echo "Running MigrationTool..."
+  chmod +x /app/Planty.MigrationTool
+  ./Planty.MigrationTool || {
+    echo "ERROR: Migration tool failed"
+    exit 1
+  }
 else
-  echo "No migrations tool found, skipping migrations"
+  echo "ERROR: Planty.MigrationTool not found at /app/Planty.MigrationTool"
+  exit 1
 fi
 
 echo "✓ Migrations completed"
