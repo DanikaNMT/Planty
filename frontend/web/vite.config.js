@@ -11,9 +11,5 @@ export default defineConfig({
         changeOrigin: true
       }
     }
-  },
-  // Environment variables will be available as import.meta.env.VITE_API_BASE
-  define: {
-    'import.meta.env.VITE_API_BASE': JSON.stringify(process.env.VITE_API_BASE || 'http://localhost:5153')
   }
 });
