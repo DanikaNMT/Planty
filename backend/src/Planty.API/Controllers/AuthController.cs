@@ -17,11 +17,13 @@ namespace Planty.API.Controllers
     {
         private readonly PlantDbContext _dbContext;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(PlantDbContext dbContext, IConfiguration configuration)
+        public AuthController(PlantDbContext dbContext, IConfiguration configuration, ILogger<AuthController> logger)
         {
             _dbContext = dbContext;
             _configuration = configuration;
+            _logger = logger;
         }
 
         [HttpPost("register")]
@@ -65,9 +67,16 @@ namespace Planty.API.Controllers
 
         private string GenerateJwtToken(User user)
         {
-            var jwtKey = _configuration["Jwt:Key"] ?? "super_secret_key_123!";
-            var jwtIssuer = _configuration["Jwt:Issuer"] ?? "Planty";
-            var jwtAudience = _configuration["Jwt:Audience"] ?? "PlantyUsers";
+            // IMPORTANT: Must match the configuration in Program.cs
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? _configuration["Jwt:Key"] ?? "THIS_IS_A_SUPER_SECRET_KEY_1234567890!!";
+            var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? _configuration["Jwt:Issuer"] ?? "Planty";
+            var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? _configuration["Jwt:Audience"] ?? "PlantyUsers";
+            
+            _logger.LogInformation("Generating JWT token - UserId: {UserId}, Issuer: {Issuer}, Audience: {Audience}, KeySource: {KeySource}, KeyLength: {KeyLength}",
+                user.Id, jwtIssuer, jwtAudience,
+                Environment.GetEnvironmentVariable("JWT_KEY") != null ? "Environment Variable" : "Configuration File",
+                jwtKey.Length);
+            
             var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var claims = new[]
@@ -84,7 +93,10 @@ namespace Planty.API.Controllers
                 expires: DateTime.UtcNow.AddDays(7),
                 signingCredentials: creds
             );
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            _logger.LogInformation("JWT token generated successfully - UserId: {UserId}, Expires: {ExpiresAt}", user.Id, token.ValidTo);
+            return tokenString;
         }
 
         private static string HashPassword(string password)

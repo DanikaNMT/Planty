@@ -24,19 +24,41 @@ using System.Security.Claims;
 public class PlantsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly ILogger<PlantsController> _logger;
 
-    public PlantsController(IMediator mediator)
+    public PlantsController(IMediator mediator, ILogger<PlantsController> logger)
     {
         _mediator = mediator;
+        _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<PlantResponse>>> GetPlants(CancellationToken cancellationToken)
     {
+        _logger.LogInformation("GetPlants request received - Authenticated: {IsAuthenticated}, AuthType: {AuthType}",
+            User.Identity?.IsAuthenticated ?? false, User.Identity?.AuthenticationType ?? "none");
+        
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId == null) return Unauthorized();
+        _logger.LogInformation("GetPlants - UserId from claims: {UserId}", userId ?? "null");
+        
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            _logger.LogDebug("GetPlants - Claims count: {ClaimsCount}", User.Claims.Count());
+            foreach (var claim in User.Claims)
+            {
+                _logger.LogDebug("GetPlants - Claim: {ClaimType} = {ClaimValue}", claim.Type, claim.Value);
+            }
+        }
+        
+        if (userId == null) 
+        {
+            _logger.LogWarning("GetPlants request unauthorized - No user ID found in claims");
+            return Unauthorized();
+        }
+        
         var query = new GetPlantsQuery(Guid.Parse(userId));
         var result = await _mediator.Send(query, cancellationToken);
+        _logger.LogInformation("GetPlants returning {PlantCount} plants for UserId: {UserId}", result.Count(), userId);
         return Ok(result);
     }
 

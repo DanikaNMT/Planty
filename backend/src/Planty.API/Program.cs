@@ -11,6 +11,14 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure logging format for Grafana Alloy
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(options =>
+{
+    options.TimestampFormat = "yyyy-MM-dd HH:mm:ss,fff - ";
+});
+builder.Logging.AddDebug();
+
 // Add systemd integration for Linux service hosting
 builder.Host.UseSystemd();
 
@@ -54,6 +62,17 @@ var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? builder.Conf
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? builder.Configuration["Jwt:Audience"] ?? "PlantyUsers";
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
+// Create a temporary logger for startup configuration
+using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder
+    .AddConsole(options => options.TimestampFormat = "yyyy-MM-dd HH:mm:ss,fff - "));
+var startupLogger = loggerFactory.CreateLogger("Startup");
+
+// Log JWT configuration (without exposing the actual key)
+startupLogger.LogInformation("JWT Configuration - Issuer: {Issuer}, Audience: {Audience}, KeySource: {KeySource}, KeyLength: {KeyLength}", 
+    jwtIssuer, jwtAudience, 
+    Environment.GetEnvironmentVariable("JWT_KEY") != null ? "Environment Variable" : "Configuration File",
+    jwtKey.Length);
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -70,6 +89,51 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
         IssuerSigningKey = new SymmetricSecurityKey(key)
+    };
+    
+    // Add detailed event logging
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError("JWT authentication failed - ExceptionType: {ExceptionType}, Message: {Message}", 
+                context.Exception.GetType().Name, context.Exception.Message);
+            if (context.Exception.InnerException != null)
+            {
+                logger.LogError("JWT authentication failed - InnerException: {InnerMessage}", 
+                    context.Exception.InnerException.Message);
+            }
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            var userId = context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            logger.LogInformation("JWT token validated successfully - UserId: {UserId}", userId ?? "unknown");
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            logger.LogWarning("JWT authentication challenge - Error: {Error}, Description: {Description}, Failure: {Failure}", 
+                context.Error ?? "none", context.ErrorDescription ?? "none", context.AuthenticateFailure?.Message ?? "none");
+            return Task.CompletedTask;
+        },
+        OnMessageReceived = context =>
+        {
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+            if (!string.IsNullOrEmpty(token))
+            {
+                logger.LogDebug("JWT token received - TokenPrefix: {TokenPrefix}", token.Substring(0, Math.Min(20, token.Length)));
+            }
+            else
+            {
+                logger.LogWarning("No JWT Authorization header found in request");
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 
